@@ -25,8 +25,8 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col dark">
-      <header className="sticky top-0 z-40 border-b bg-background">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between py-4">
           {/* Update the header branding */}
           <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export default function AdminLayout({
           </div>
         </div>
       </header>
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <aside className="hidden w-64 border-r bg-muted/40 md:block">
           <div className="flex h-full flex-col gap-2">
             <div className="flex-1 overflow-auto py-2">
@@ -85,7 +85,7 @@ export default function AdminLayout({
                 </Link>
                 <Link
                   href="/admin/messages"
-                  className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                 >
                   <MessageSquare className="h-4 w-4" />
                   Messages de Contact
@@ -144,7 +144,7 @@ export default function AdminLayout({
             </div>
           </div>
         </aside>
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto bg-background">{children}</main>
       </div>
     </div>
   )

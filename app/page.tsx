@@ -1,13 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -20,48 +18,639 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Code,
-  Globe,
-  ShoppingCart,
-  Smartphone,
-  Cloud,
-  CheckCircle,
   ArrowRight,
-  Star,
-  Award,
-  TrendingUp,
   Menu,
   X,
-  CalendarIcon,
-  Clock,
   Send,
-  Rocket,
-  Ticket,
-  Store,
-  GraduationCap,
-  BookOpen,
-  Users,
-  BarChart3,
-  Wallet,
-  Utensils,
-  Scissors,
+  CheckCircle,
+  Shield,
+  Zap,
+  Layers,
+  Building2,
+  TrendingUp,
+  Server,
+  Database,
+  Lock,
 } from "lucide-react"
-import { format } from "date-fns"
-import { fr } from "date-fns/locale"
 import { toast } from "@/hooks/use-toast"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+// Comprehensive i18n translations for entire landing page
+const translations = {
+  en: {
+    nav: {
+      approach: "Approach",
+      services: "Services",
+      industries: "Industries",
+      contact: "Contact",
+    },
+    hero: {
+      h1: "Engineering, Operating & Scaling Digital Platforms",
+      subheadline: "We build custom software, modernize existing systems, and manage scalable infrastructure for businesses that rely on serious digital platforms.",
+      primaryCta: "Discuss Your Project",
+      secondaryCta: "Explore Our Approach",
+    },
+    whoWeAre: {
+      title: "Digital Infrastructure. Built for Scale.",
+      intro: "Revosso is a digital infrastructure and platform engineering company focused on building secure, scalable, and maintainable systems.",
+      partnerTitle: "We partner with businesses that require:",
+      requirements: [
+        "Robust backend architecture",
+        "High-performance platforms",
+        "Secure financial and operational systems",
+        "Long-term technical scalability",
+      ],
+      closing: "We don't build short-term solutions.\nWe engineer digital foundations.",
+    },
+    platformLifecycle: {
+      title: "From Architecture to Operation",
+      subtitle: "Full lifecycle platform engineering: build, take over, and operate.",
+      build: {
+        title: "BUILD",
+        description: "We design and develop custom digital platforms aligned with your business model and long-term growth.",
+      },
+      takeOver: {
+        title: "TAKE OVER & OPTIMIZE",
+        intro: "We take ownership of existing systems to:",
+        items: [
+          "Stabilize and refactor codebases",
+          "Improve performance",
+          "Reduce technical debt",
+          "Modernize architecture",
+          "Strengthen security",
+        ],
+      },
+      operate: {
+        title: "OPERATE & SCALE",
+        intro: "We manage infrastructure and platform operations including:",
+        items: [
+          "Secure hosting",
+          "Performance monitoring",
+          "Cloud deployment",
+          "Ongoing technical maintenance",
+          "Infrastructure scaling",
+        ],
+      },
+      cta: "Discuss Your Platform Needs",
+    },
+    howWeWork: {
+      title: "Engineering with Long-Term Vision",
+      principles: [
+        { title: "Architecture before code", description: "We design systems that scale" },
+        { title: "Scalability from day one", description: "Built to grow with your business" },
+        { title: "Security-first mindset", description: "Protection built into the foundation" },
+        { title: "Clean and maintainable", description: "Code that stands the test of time" },
+        { title: "Performance as baseline", description: "Speed and efficiency by design" },
+        { title: "Robust infrastructure", description: "Reliable systems you can depend on" },
+      ],
+    },
+    industries: {
+      title: "Built for Ambitious Businesses",
+      items: [
+        { title: "Financial Services", description: "Secure, compliant systems for financial operations" },
+        { title: "Digital Commerce", description: "High-performance e-commerce platforms" },
+        { title: "Enterprise Operations", description: "Scalable infrastructure for large organizations" },
+        { title: "Technology-Driven Startups", description: "Foundation systems for rapid growth" },
+      ],
+      cta: "Discuss Your Industry Needs",
+    },
+    clients: {
+      title: "Trusted by Businesses & Partners",
+      copy: "We partner with businesses and platforms to deliver secure, scalable, and high-performance solutions.",
+    },
+    finalCta: {
+      title: "Let's Build the Infrastructure Behind Your Growth",
+      subtitle: "Discuss your project requirements and explore how we can engineer scalable solutions for your business.",
+      trust: "We establish long-term partnerships built on structured engineering, operational stability, and continuous platform evolution. Our approach prioritizes architectural clarity and technical ownership over short-term fixes.",
+      button: "Contact Us",
+    },
+    contact: {
+      title: {
+        default: "Contact Us",
+        newPlatform: "New Platform Development",
+        takeover: "Platform Takeover & Optimization",
+        maintenance: "Platform Maintenance",
+        hosting: "Infrastructure & Hosting",
+        partnership: "Partnership Inquiry",
+      },
+      description: "Tell us about your project and we'll get back to you within 24 hours.",
+      fields: {
+        name: "Name",
+        email: "Email",
+        company: "Company",
+        need: "What do you need?",
+        message: "Message",
+        needPlaceholder: "Select your need",
+        messagePlaceholder: "Tell us about your project...",
+      },
+      options: {
+        newPlatform: "New Platform Development",
+        takeover: "Platform Takeover & Optimization",
+        maintenance: "Platform Maintenance",
+        hosting: "Infrastructure & Hosting",
+        partnership: "Partnership",
+        general: "General Inquiry",
+      },
+      buttons: {
+        cancel: "Cancel",
+        send: "Send Message",
+        sending: "Sending...",
+      },
+      toast: {
+        selectionRequired: "Selection required",
+        selectionRequiredDesc: "Please select what you need.",
+        success: "Message sent successfully",
+        successDesc: "We'll respond within 24 hours. A confirmation email has been sent to your inbox.",
+        error: "Error",
+        errorDesc: "An error occurred.",
+      },
+    },
+    footer: {
+      description: "Digital infrastructure and platform engineering for scalable growth.",
+      services: "Services",
+      company: "Company",
+      contact: "Contact",
+      links: {
+        customPlatforms: "Custom Platforms",
+        platformEngineering: "Platform Engineering",
+        infrastructure: "Infrastructure",
+        ourApproach: "Our Approach",
+        industries: "Industries",
+        contact: "Contact",
+      },
+      copyright: "All rights reserved.",
+    },
+  },
+  fr: {
+    nav: {
+      approach: "Approche",
+      services: "Services",
+      industries: "Industries",
+      contact: "Contact",
+    },
+    hero: {
+      h1: "Ingénierie, Exploitation et Mise à l'Échelle de Plateformes Numériques",
+      subheadline: "Nous construisons des logiciels sur mesure, modernisons les systèmes existants et gérons une infrastructure évolutive pour les entreprises qui dépendent de plateformes numériques sérieuses.",
+      primaryCta: "Discuter de Votre Projet",
+      secondaryCta: "Découvrir Notre Approche",
+    },
+    whoWeAre: {
+      title: "Infrastructure Numérique. Construite pour l'Échelle.",
+      intro: "Revosso est une entreprise d'ingénierie d'infrastructure numérique et de plateformes axée sur la construction de systèmes sécurisés, évolutifs et maintenables.",
+      partnerTitle: "Nous collaborons avec des entreprises qui nécessitent:",
+      requirements: [
+        "Une architecture backend robuste",
+        "Des plateformes haute performance",
+        "Des systèmes financiers et opérationnels sécurisés",
+        "Une évolutivité technique à long terme",
+      ],
+      closing: "Nous ne construisons pas de solutions à court terme.\nNous concevons des fondations numériques.",
+    },
+    platformLifecycle: {
+      title: "De l'Architecture à l'Exploitation",
+      subtitle: "Ingénierie de plateforme à cycle de vie complet: construire, reprendre et exploiter.",
+      build: {
+        title: "CONSTRUIRE",
+        description: "Nous concevons et développons des plateformes numériques sur mesure alignées avec votre modèle commercial et votre croissance à long terme.",
+      },
+      takeOver: {
+        title: "REPRENDRE & OPTIMISER",
+        intro: "Nous prenons possession des systèmes existants pour:",
+        items: [
+          "Stabiliser et refactoriser les bases de code",
+          "Améliorer les performances",
+          "Réduire la dette technique",
+          "Moderniser l'architecture",
+          "Renforcer la sécurité",
+        ],
+      },
+      operate: {
+        title: "EXPLOITER & METTRE À L'ÉCHELLE",
+        intro: "Nous gérons l'infrastructure et les opérations de plateforme, notamment:",
+        items: [
+          "Hébergement sécurisé",
+          "Surveillance des performances",
+          "Déploiement cloud",
+          "Maintenance technique continue",
+          "Mise à l'échelle de l'infrastructure",
+        ],
+      },
+      cta: "Discuter de Vos Besoins de Plateforme",
+    },
+    howWeWork: {
+      title: "Ingénierie avec Vision à Long Terme",
+      principles: [
+        { title: "Architecture avant le code", description: "Nous concevons des systèmes qui évoluent" },
+        { title: "Évolutivité dès le premier jour", description: "Construit pour grandir avec votre entreprise" },
+        { title: "Mentalité sécurité d'abord", description: "Protection intégrée dans les fondations" },
+        { title: "Propre et maintenable", description: "Code qui résiste à l'épreuve du temps" },
+        { title: "Performance comme référence", description: "Vitesse et efficacité par conception" },
+        { title: "Infrastructure robuste", description: "Systèmes fiables sur lesquels vous pouvez compter" },
+      ],
+    },
+    industries: {
+      title: "Construit pour les Entreprises Ambitieuses",
+      items: [
+        { title: "Services Financiers", description: "Systèmes sécurisés et conformes pour les opérations financières" },
+        { title: "Commerce Numérique", description: "Plateformes e-commerce haute performance" },
+        { title: "Opérations d'Entreprise", description: "Infrastructure évolutive pour les grandes organisations" },
+        { title: "Startups Axées sur la Technologie", description: "Systèmes de base pour une croissance rapide" },
+      ],
+      cta: "Discuter de Vos Besoins Sectoriels",
+    },
+    clients: {
+      title: "Reconnu par les Entreprises & Partenaires",
+      copy: "Nous collaborons avec des entreprises et des plateformes pour fournir des solutions sécurisées, évolutives et performantes.",
+    },
+    finalCta: {
+      title: "Construisons l'Infrastructure derrière Votre Croissance",
+      subtitle: "Discutez de vos exigences de projet et explorez comment nous pouvons concevoir des solutions évolutives pour votre entreprise.",
+      trust: "Nous établissons des partenariats à long terme basés sur une ingénierie structurée, une stabilité opérationnelle et une évolution continue de la plateforme. Notre approche privilégie la clarté architecturale et la propriété technique aux correctifs à court terme.",
+      button: "Nous Contacter",
+    },
+    contact: {
+      title: {
+        default: "Nous Contacter",
+        newPlatform: "Développement de Nouvelle Plateforme",
+        takeover: "Reprise & Optimisation de Plateforme",
+        maintenance: "Maintenance de Plateforme",
+        hosting: "Infrastructure & Hébergement",
+        partnership: "Demande de Partenariat",
+      },
+      description: "Parlez-nous de votre projet et nous vous répondrons dans les 24 heures.",
+      fields: {
+        name: "Nom",
+        email: "Email",
+        company: "Entreprise",
+        need: "De quoi avez-vous besoin?",
+        message: "Message",
+        needPlaceholder: "Sélectionnez votre besoin",
+        messagePlaceholder: "Parlez-nous de votre projet...",
+      },
+      options: {
+        newPlatform: "Développement de Nouvelle Plateforme",
+        takeover: "Reprise & Optimisation de Plateforme",
+        maintenance: "Maintenance de Plateforme",
+        hosting: "Infrastructure & Hébergement",
+        partnership: "Partenariat",
+        general: "Demande Générale",
+      },
+      buttons: {
+        cancel: "Annuler",
+        send: "Envoyer le Message",
+        sending: "Envoi en cours...",
+      },
+      toast: {
+        selectionRequired: "Sélection requise",
+        selectionRequiredDesc: "Veuillez sélectionner ce dont vous avez besoin.",
+        success: "Message envoyé avec succès",
+        successDesc: "Nous répondrons dans les 24 heures. Un email de confirmation a été envoyé à votre boîte de réception.",
+        error: "Erreur",
+        errorDesc: "Une erreur s'est produite.",
+      },
+    },
+    footer: {
+      description: "Ingénierie d'infrastructure numérique et de plateformes pour une croissance évolutive.",
+      services: "Services",
+      company: "Entreprise",
+      contact: "Contact",
+      links: {
+        customPlatforms: "Plateformes Sur Mesure",
+        platformEngineering: "Ingénierie de Plateforme",
+        infrastructure: "Infrastructure",
+        ourApproach: "Notre Approche",
+        industries: "Industries",
+        contact: "Contact",
+      },
+      copyright: "Tous droits réservés.",
+    },
+  },
+  "pt-BR": {
+    nav: {
+      approach: "Abordagem",
+      services: "Serviços",
+      industries: "Indústrias",
+      contact: "Contato",
+    },
+    hero: {
+      h1: "Engenharia, Operação e Escalabilidade de Plataformas Digitais",
+      subheadline: "Construímos software personalizado, modernizamos sistemas existentes e gerenciamos infraestrutura escalável para empresas que dependem de plataformas digitais sérias.",
+      primaryCta: "Discutir Seu Projeto",
+      secondaryCta: "Explorar Nossa Abordagem",
+    },
+    whoWeAre: {
+      title: "Infraestrutura Digital. Construída para Escala.",
+      intro: "Revosso é uma empresa de engenharia de infraestrutura digital e plataformas focada em construir sistemas seguros, escaláveis e sustentáveis.",
+      partnerTitle: "Parceiros de empresas que requerem:",
+      requirements: [
+        "Arquitetura backend robusta",
+        "Plataformas de alto desempenho",
+        "Sistemas financeiros e operacionais seguros",
+        "Escalabilidade técnica de longo prazo",
+      ],
+      closing: "Não construímos soluções de curto prazo.\nProjetamos fundações digitais.",
+    },
+    platformLifecycle: {
+      title: "Da Arquitetura à Operação",
+      subtitle: "Engenharia de plataforma de ciclo de vida completo: construir, assumir e operar.",
+      build: {
+        title: "CONSTRUIR",
+        description: "Projetamos e desenvolvemos plataformas digitais personalizadas alinhadas com seu modelo de negócios e crescimento de longo prazo.",
+      },
+      takeOver: {
+        title: "ASSUMIR & OTIMIZAR",
+        intro: "Assumimos a propriedade de sistemas existentes para:",
+        items: [
+          "Estabilizar e refatorar bases de código",
+          "Melhorar o desempenho",
+          "Reduzir a dívida técnica",
+          "Modernizar a arquitetura",
+          "Fortalecer a segurança",
+        ],
+      },
+      operate: {
+        title: "OPERAR & ESCALAR",
+        intro: "Gerenciamos infraestrutura e operações de plataforma, incluindo:",
+        items: [
+          "Hospedagem segura",
+          "Monitoramento de desempenho",
+          "Implantações em nuvem",
+          "Manutenção técnica contínua",
+          "Escalabilidade de infraestrutura",
+        ],
+      },
+      cta: "Discutir Suas Necessidades de Plataforma",
+    },
+    howWeWork: {
+      title: "Engenharia com Visão de Longo Prazo",
+      principles: [
+        { title: "Arquitetura antes do código", description: "Projetamos sistemas que escalam" },
+        { title: "Escalabilidade desde o primeiro dia", description: "Construído para crescer com seu negócio" },
+        { title: "Mentalidade segurança primeiro", description: "Proteção integrada na fundação" },
+        { title: "Limpo e sustentável", description: "Código que resiste ao teste do tempo" },
+        { title: "Performance como linha de base", description: "Velocidade e eficiência por design" },
+        { title: "Infraestrutura robusta", description: "Sistemas confiáveis nos quais você pode contar" },
+      ],
+    },
+    industries: {
+      title: "Construído para Empresas Ambiciosas",
+      items: [
+        { title: "Serviços Financeiros", description: "Sistemas seguros e compatíveis para operações financeiras" },
+        { title: "Comércio Digital", description: "Plataformas de e-commerce de alto desempenho" },
+        { title: "Operações Empresariais", description: "Infraestrutura escalável para grandes organizações" },
+        { title: "Startups Impulsionadas por Tecnologia", description: "Sistemas de base para crescimento rápido" },
+      ],
+      cta: "Discutir Suas Necessidades do Setor",
+    },
+    clients: {
+      title: "Confiado por Empresas & Parceiros",
+      copy: "Parceiros de empresas e plataformas para entregar soluções seguras, escaláveis e de alto desempenho.",
+    },
+    finalCta: {
+      title: "Vamos Construir a Infraestrutura por Trás do Seu Crescimento",
+      subtitle: "Discuta os requisitos do seu projeto e explore como podemos projetar soluções escaláveis para seu negócio.",
+      trust: "Estabelecemos parcerias de longo prazo baseadas em engenharia estruturada, estabilidade operacional e evolução contínua da plataforma. Nossa abordagem prioriza clareza arquitetural e propriedade técnica sobre correções de curto prazo.",
+      button: "Entre em Contato",
+    },
+    contact: {
+      title: {
+        default: "Entre em Contato",
+        newPlatform: "Desenvolvimento de Nova Plataforma",
+        takeover: "Assunção & Otimização de Plataforma",
+        maintenance: "Manutenção de Plataforma",
+        hosting: "Infraestrutura & Hospedagem",
+        partnership: "Consulta de Parceria",
+      },
+      description: "Conte-nos sobre seu projeto e retornaremos em até 24 horas.",
+      fields: {
+        name: "Nome",
+        email: "Email",
+        company: "Empresa",
+        need: "O que você precisa?",
+        message: "Mensagem",
+        needPlaceholder: "Selecione sua necessidade",
+        messagePlaceholder: "Conte-nos sobre seu projeto...",
+      },
+      options: {
+        newPlatform: "Desenvolvimento de Nova Plataforma",
+        takeover: "Assunção & Otimização de Plataforma",
+        maintenance: "Manutenção de Plataforma",
+        hosting: "Infraestrutura & Hospedagem",
+        partnership: "Parceria",
+        general: "Consulta Geral",
+      },
+      buttons: {
+        cancel: "Cancelar",
+        send: "Enviar Mensagem",
+        sending: "Enviando...",
+      },
+      toast: {
+        selectionRequired: "Seleção necessária",
+        selectionRequiredDesc: "Por favor, selecione o que você precisa.",
+        success: "Mensagem enviada com sucesso",
+        successDesc: "Responderemos em até 24 horas. Um email de confirmação foi enviado para sua caixa de entrada.",
+        error: "Erro",
+        errorDesc: "Ocorreu um erro.",
+      },
+    },
+    footer: {
+      description: "Engenharia de infraestrutura digital e plataformas para crescimento escalável.",
+      services: "Serviços",
+      company: "Empresa",
+      contact: "Contato",
+      links: {
+        customPlatforms: "Plataformas Personalizadas",
+        platformEngineering: "Engenharia de Plataforma",
+        infrastructure: "Infraestrutura",
+        ourApproach: "Nossa Abordagem",
+        industries: "Indústrias",
+        contact: "Contato",
+      },
+      copyright: "Todos os direitos reservados.",
+    },
+  },
+  es: {
+    nav: {
+      approach: "Enfoque",
+      services: "Servicios",
+      industries: "Industrias",
+      contact: "Contacto",
+    },
+    hero: {
+      h1: "Ingeniería, Operación y Escalabilidad de Plataformas Digitales",
+      subheadline: "Construimos software personalizado, modernizamos sistemas existentes y gestionamos infraestructura escalable para empresas que dependen de plataformas digitales serias.",
+      primaryCta: "Discutir Tu Proyecto",
+      secondaryCta: "Explorar Nuestro Enfoque",
+    },
+    whoWeAre: {
+      title: "Infraestructura Digital. Construida para Escala.",
+      intro: "Revosso es una empresa de ingeniería de infraestructura digital y plataformas enfocada en construir sistemas seguros, escalables y mantenibles.",
+      partnerTitle: "Trabajamos con empresas que requieren:",
+      requirements: [
+        "Arquitectura backend robusta",
+        "Plataformas de alto rendimiento",
+        "Sistemas financieros y operativos seguros",
+        "Escalabilidad técnica a largo plazo",
+      ],
+      closing: "No construimos soluciones a corto plazo.\nIngeniamos fundamentos digitales.",
+    },
+    platformLifecycle: {
+      title: "De la Arquitectura a la Operación",
+      subtitle: "Ingeniería de plataforma de ciclo de vida completo: construir, asumir y operar.",
+      build: {
+        title: "CONSTRUIR",
+        description: "Diseñamos y desarrollamos plataformas digitales personalizadas alineadas con tu modelo de negocio y crecimiento a largo plazo.",
+      },
+      takeOver: {
+        title: "ASUMIR & OPTIMIZAR",
+        intro: "Asumimos la propiedad de sistemas existentes para:",
+        items: [
+          "Estabilizar y refactorizar bases de código",
+          "Mejorar el rendimiento",
+          "Reducir la deuda técnica",
+          "Modernizar la arquitectura",
+          "Fortalecer la seguridad",
+        ],
+      },
+      operate: {
+        title: "OPERAR & ESCALAR",
+        intro: "Gestionamos infraestructura y operaciones de plataforma, incluyendo:",
+        items: [
+          "Alojamiento seguro",
+          "Monitoreo de rendimiento",
+          "Despliegue en la nube",
+          "Mantenimiento técnico continuo",
+          "Escalabilidad de infraestructura",
+        ],
+      },
+      cta: "Discutir Tus Necesidades de Plataforma",
+    },
+    howWeWork: {
+      title: "Ingeniería con Visión a Largo Plazo",
+      principles: [
+        { title: "Arquitectura antes del código", description: "Diseñamos sistemas que escalan" },
+        { title: "Escalabilidad desde el primer día", description: "Construido para crecer con tu negocio" },
+        { title: "Mentalidad seguridad primero", description: "Protección integrada en los fundamentos" },
+        { title: "Limpio y mantenible", description: "Código que resiste la prueba del tiempo" },
+        { title: "Rendimiento como línea base", description: "Velocidad y eficiencia por diseño" },
+        { title: "Infraestructura robusta", description: "Sistemas confiables en los que puedes contar" },
+      ],
+    },
+    industries: {
+      title: "Construido para Empresas Ambiciosas",
+      items: [
+        { title: "Servicios Financieros", description: "Sistemas seguros y compatibles para operaciones financieras" },
+        { title: "Comercio Digital", description: "Plataformas de comercio electrónico de alto rendimiento" },
+        { title: "Operaciones Empresariales", description: "Infraestructura escalable para grandes organizaciones" },
+        { title: "Startups Impulsadas por Tecnología", description: "Sistemas de base para crecimiento rápido" },
+      ],
+      cta: "Discutir Tus Necesidades del Sector",
+    },
+    clients: {
+      title: "Confiado por Empresas y Socios",
+      copy: "Trabajamos con empresas y plataformas para ofrecer soluciones seguras, escalables y de alto rendimiento.",
+    },
+    finalCta: {
+      title: "Construyamos la Infraestructura Detrás de Tu Crecimiento",
+      subtitle: "Discute los requisitos de tu proyecto y explora cómo podemos diseñar soluciones escalables para tu negocio.",
+      trust: "Establecemos asociaciones a largo plazo basadas en ingeniería estructurada, estabilidad operacional y evolución continua de la plataforma. Nuestro enfoque prioriza la claridad arquitectónica y la propiedad técnica sobre soluciones a corto plazo.",
+      button: "Contáctanos",
+    },
+    contact: {
+      title: {
+        default: "Contáctanos",
+        newPlatform: "Desarrollo de Nueva Plataforma",
+        takeover: "Asunción & Optimización de Plataforma",
+        maintenance: "Mantenimiento de Plataforma",
+        hosting: "Infraestructura & Alojamiento",
+        partnership: "Consulta de Asociación",
+      },
+      description: "Cuéntanos sobre tu proyecto y te responderemos en 24 horas.",
+      fields: {
+        name: "Nombre",
+        email: "Email",
+        company: "Empresa",
+        need: "¿Qué necesitas?",
+        message: "Mensaje",
+        needPlaceholder: "Selecciona tu necesidad",
+        messagePlaceholder: "Cuéntanos sobre tu proyecto...",
+      },
+      options: {
+        newPlatform: "Desarrollo de Nueva Plataforma",
+        takeover: "Asunción & Optimización de Plataforma",
+        maintenance: "Mantenimiento de Plataforma",
+        hosting: "Infraestructura & Alojamiento",
+        partnership: "Asociación",
+        general: "Consulta General",
+      },
+      buttons: {
+        cancel: "Cancelar",
+        send: "Enviar Mensaje",
+        sending: "Enviando...",
+      },
+      toast: {
+        selectionRequired: "Selección requerida",
+        selectionRequiredDesc: "Por favor, selecciona lo que necesitas.",
+        success: "Mensaje enviado con éxito",
+        successDesc: "Te responderemos en 24 horas. Se ha enviado un email de confirmación a tu bandeja de entrada.",
+        error: "Error",
+        errorDesc: "Ocurrió un error.",
+      },
+    },
+    footer: {
+      description: "Ingeniería de infraestructura digital y plataformas para crecimiento escalable.",
+      services: "Servicios",
+      company: "Empresa",
+      contact: "Contacto",
+      links: {
+        customPlatforms: "Plataformas Personalizadas",
+        platformEngineering: "Ingeniería de Plataforma",
+        infrastructure: "Infraestructura",
+        ourApproach: "Nuestro Enfoque",
+        industries: "Industrias",
+        contact: "Contacto",
+      },
+      copyright: "Todos los derechos reservados.",
+    },
+  },
+}
+
+// Client/Partner data
+const clients = [
+  { name: "Cashlakay", url: "https://cashlakay.com", description: "Custom platform development" },
+  { name: "Revofin", url: "https://finance.revosso.com", description: "Financial platform hosting" },
+  { name: "Rechajem", url: "https://rechajem-dev.revosso.com/", description: "Platform development" },
+  { name: "Nuvann", url: "https://staging.nuvann.com", description: "Platform hosting" },
+]
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [isContactOpen, setIsContactOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedProjectTypes, setSelectedProjectTypes] = useState<string[]>([])
+  const [selectedInterest, setSelectedInterest] = useState<string>("")
+  const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
+
+  // Detect browser locale on mount
+  useEffect(() => {
+    const browserLocale = navigator.language || "en"
+    if (browserLocale.startsWith("fr")) {
+      setLocale("fr")
+    } else if (browserLocale.startsWith("pt")) {
+      setLocale("pt-BR")
+    } else if (browserLocale.startsWith("es")) {
+      setLocale("es")
+    } else {
+      setLocale("en")
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -69,162 +658,63 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const services = [
-    {
-      icon: Smartphone,
-      title: "Développement Mobile",
-      description:
-        "Applications mobiles natives et multiplateformes qui offrent des expériences utilisateur exceptionnelles sur iOS et Android.",
-      features: ["Développement iOS et Android", "React Native et Flutter", "Optimisation App Store"],
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: Globe,
-      title: "Développement Web",
-      description:
-        "Sites web modernes et réactifs et applications web construites avec des technologies de pointe et les meilleures pratiques.",
-      features: ["React, Next.js et Vue.js", "Applications Web Progressives", "Optimisation des Performances"],
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      icon: ShoppingCart,
-      title: "Solutions E-Commerce",
-      description:
-        "Plateformes e-commerce complètes avec paiements sécurisés, gestion des stocks et analyses avancées.",
-      features: ["Shopify et WooCommerce", "Intégration de Paiement", "Gestion des Stocks"],
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: Code,
-      title: "Logiciels d'Entreprise",
-      description:
-        "Solutions d'entreprise personnalisées avec intégration IA, automatisation des flux de travail et architecture évolutive.",
-      features: ["IA et Apprentissage Automatique", "Intégration Systèmes Hérités", "Automatisation des Flux"],
-      gradient: "from-orange-500 to-red-500",
-    },
-    {
-      icon: Cloud,
-      title: "Infrastructure Cloud",
-      description:
-        "Solutions cloud complètes avec hébergement, DevOps, pipelines CI/CD et sécurité de niveau entreprise.",
-      features: ["SLA 99,9% de Disponibilité", "DevOps et CI/CD", "Infrastructure Auto-évolutive"],
-      gradient: "from-indigo-500 to-purple-500",
-    },
-    {
-      icon: Star,
-      title: "Design UI/UX",
-      description:
-        "Design centré sur l'utilisateur qui crée des expériences numériques intuitives, engageantes et accessibles.",
-      features: ["Recherche et Tests Utilisateur", "Prototypage et Wireframing", "Conformité Accessibilité"],
-      gradient: "from-pink-500 to-rose-500",
-    },
-  ]
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "PDG, TechInnovate",
-      content:
-        "Revosso a transformé notre présence numérique avec leurs solutions innovantes. L'expertise et le dévouement de l'équipe ont dépassé nos attentes.",
-      rating: 5,
-      avatar: "/placeholder.svg?height=60&width=60",
-    },
-    {
-      name: "Michael Chen",
-      role: "CTO, GrowthWave",
-      content:
-        "Expertise technique exceptionnelle et gestion de projet. Ils ont livré notre plateforme complexe dans les temps et le budget.",
-      rating: 5,
-      avatar: "/placeholder.svg?height=60&width=60",
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Fondatrice, EcoSolutions",
-      content:
-        "L'infrastructure cloud qu'ils ont construite pour nous a été très solide. Leur support continu est exceptionnel.",
-      rating: 5,
-      avatar: "/placeholder.svg?height=60&width=60",
-    },
-  ]
-
-  const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
-
-  const projectTypes = [
-    { id: "mobile", label: "Application Mobile" },
-    { id: "web", label: "Application Web" },
-    { id: "ecommerce", label: "Plateforme E-Commerce" },
-    { id: "enterprise", label: "Logiciel d'Entreprise" },
-    { id: "cloud", label: "Infrastructure Cloud" },
-    { id: "design", label: "Design UI/UX" },
-    { id: "other", label: "Autre" },
-  ]
-
-  const handleProjectTypeChange = (projectTypeId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedProjectTypes([...selectedProjectTypes, projectTypeId])
-    } else {
-      setSelectedProjectTypes(selectedProjectTypes.filter((id) => id !== projectTypeId))
-    }
-  }
-
-  const handleProjectSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    const formData = new FormData(e.currentTarget)
-    const projectData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      company: formData.get("company"),
-      projectTypes: selectedProjectTypes,
-      budget: formData.get("budget"),
-      timeline: formData.get("timeline"),
-      description: formData.get("description"),
+    if (!selectedInterest) {
+      toast({
+        title: translations[locale].contact.toast.selectionRequired,
+        description: translations[locale].contact.toast.selectionRequiredDesc,
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
     }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    console.log("Project submission:", projectData)
-    setIsSubmitting(false)
-    setIsProjectModalOpen(false)
-    setSelectedProjectTypes([])
-
-    // Show success message
-    toast({
-      title: "Projet envoyé",
-      description: "Nous vous recontactons sous 24 heures avec la prochaine étape.",
-    })
-  }
-
-  const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
     const formData = new FormData(e.currentTarget)
-    const consultationData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      company: formData.get("company"),
-      phone: formData.get("phone"),
-      service: formData.get("service"),
-      date: selectedDate,
-      time: formData.get("time"),
-      message: formData.get("message"),
+    const contactData = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      company: formData.get("company") as string | undefined,
+      message: formData.get("message") as string,
+      productInterest: selectedInterest as "NEW_PLATFORM" | "PLATFORM_TAKEOVER" | "PLATFORM_MAINTENANCE" | "INFRASTRUCTURE_HOSTING" | "PARTNERSHIP" | "GENERAL_INQUIRY",
+      source: "homepage",
+      honeypot: "",
     }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(contactData),
+      })
 
-    console.log("Consultation booking:", consultationData)
-    setIsSubmitting(false)
-    setIsConsultationModalOpen(false)
+      const data = await response.json()
 
-    // Show success message
-    toast({
-      title: "Consultation programmée",
-      description: "Invitation et email de confirmation en cours d'envoi.",
-    })
+      if (!response.ok) {
+        throw new Error(data.error || "Error sending message")
+      }
+
+      setIsSubmitting(false)
+      setIsContactOpen(false)
+      setSelectedInterest("")
+      e.currentTarget.reset()
+
+      toast({
+        title: translations[locale].contact.toast.success,
+        description: translations[locale].contact.toast.successDesc,
+      })
+    } catch (error) {
+      setIsSubmitting(false)
+      toast({
+        title: translations[locale].contact.toast.error,
+        description: error instanceof Error ? error.message : translations[locale].contact.toast.errorDesc,
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -237,7 +727,6 @@ export default function LandingPage() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 lg:h-20 items-center justify-between">
-            {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" suppressHydrationWarning></div>
@@ -250,16 +739,15 @@ export default function LandingPage() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
               {[
-                { name: "Services", href: "#services" },
-                { name: "Produits", href: "#products" },
-                { name: "À Propos", href: "#about" },
-                { name: "Contact", href: "#contact" },
+                { name: translations[locale].nav.approach, href: "#approach" },
+                { name: translations[locale].nav.services, href: "#services" },
+                { name: translations[locale].nav.industries, href: "#industries" },
+                { name: translations[locale].nav.contact, href: "#contact" },
               ].map((item) => (
                 <Link
-                  key={item.name}
+                  key={item.href}
                   href={item.href}
                   className="text-slate-300 hover:text-blue-400 font-medium transition-colors duration-200 relative group"
                 >
@@ -269,22 +757,17 @@ export default function LandingPage() {
               ))}
             </nav>
 
-            {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-4">
-              <Button variant="ghost" className="text-slate-300 hover:text-blue-400">
-                Se Connecter
-              </Button>
-              <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
+              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                    Commencer
+                    {translations[locale].hero.primaryCta}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </DialogTrigger>
               </Dialog>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="lg:hidden flex items-center space-x-2">
               <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-slate-300">
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -292,18 +775,17 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl">
               <nav className="container mx-auto px-4 py-6 space-y-4">
                 {[
-                  { name: "Services", href: "#services" },
-                  { name: "Produits", href: "#products" },
-                  { name: "À Propos", href: "#about" },
-                  { name: "Contact", href: "#contact" },
+                  { name: translations[locale].nav.approach, href: "#approach" },
+                  { name: translations[locale].nav.services, href: "#services" },
+                  { name: translations[locale].nav.industries, href: "#industries" },
+                  { name: translations[locale].nav.contact, href: "#contact" },
                 ].map((item) => (
                   <Link
-                    key={item.name}
+                    key={item.href}
                     href={item.href}
                     className="block text-slate-300 hover:text-blue-400 font-medium py-2 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
@@ -311,14 +793,11 @@ export default function LandingPage() {
                     {item.name}
                   </Link>
                 ))}
-                <div className="pt-4 space-y-3">
-                  <Button variant="ghost" className="w-full justify-start">
-                    Se Connecter
-                  </Button>
-                  <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
+                <div className="pt-4">
+                  <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                     <DialogTrigger asChild>
                       <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                        Commencer
+                        {translations[locale].hero.primaryCta}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </DialogTrigger>
@@ -332,176 +811,185 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-16 lg:py-24">
-          {/* Background Elements */}
+        <section className="relative overflow-x-hidden py-20 lg:py-32">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl"></div>
           </div>
 
-          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[520px] lg:min-h-[600px]">
-              {/* Content */}
-              <div className="space-y-8 text-center lg:text-left relative z-10">
-                <div className="space-y-6">
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                    <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-                      Solutions Logicielles Révolutionnaires
-                    </span>
-                  </h1>
+          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+            <div className="text-center space-y-8 py-16 lg:py-24">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                  {translations[locale].hero.h1}
+                </span>
+              </h1>
 
-                  <p className="text-lg sm:text-xl lg:text-2xl text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    Transformer les idées en solutions numériques puissantes. Mobile, web, e-commerce, plateformes à la
-                    demande et hébergement cloud.
-                  </p>
-                </div>
+              <p className="text-xl sm:text-2xl lg:text-3xl text-slate-300 leading-relaxed max-w-3xl mx-auto">
+                {translations[locale].hero.subheadline}
+              </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
-                  <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="lg"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6 border-0"
-                      >
-                        Commencer
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                    >
+                      {translations[locale].hero.primaryCta}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </DialogTrigger>
+                </Dialog>
 
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 group bg-transparent backdrop-blur-sm"
-                    onClick={() => {
-                      document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })
-                    }}
-                  >
-                    Nos Services
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Hero Image */}
-              <div className="relative mt-8 lg:mt-0">
-                <div className="relative z-10">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-2xl opacity-20" suppressHydrationWarning></div>
-                  <Image
-                    src="/images/hero-revolutionary-software.png"
-                    width={600}
-                    height={600}
-                    sizes="(min-width: 1024px) 600px, 100vw"
-                    alt="Solutions Logicielles Révolutionnaires - Équipe de développement moderne"
-                    className="relative z-10 w-full h-auto rounded-3xl shadow-2xl"
-                    priority
-                  />
-                </div>
-
-                {/* Floating Elements */}
-                <div className="absolute -top-6 -right-6 bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-700 hidden lg:block">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-slate-300">Projets en Direct</span>
-                  </div>
-                </div>
-
-                <div className="absolute -bottom-6 -left-6 bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-700 hidden lg:block">
-                  <div className="flex items-center space-x-3">
-                    <TrendingUp className="h-5 w-5 text-blue-600" />
-                    <span className="text-sm font-medium text-slate-300">Suivi de Croissance</span>
-                  </div>
-                </div>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
+                  onClick={() => {
+                    document.getElementById("approach")?.scrollIntoView({ behavior: "smooth" })
+                  }}
+                >
+                  {translations[locale].hero.secondaryCta}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Services Section */}
-        <section id="services" className="py-20 lg:py-32 bg-slate-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="text-center max-w-4xl mx-auto mb-16 lg:mb-24">
-              <Badge className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 text-blue-300 border-blue-800 mb-6">
-                Notre Expertise
-              </Badge>
+        {/* Who We Are Section */}
+        <section id="approach" className="py-20 lg:py-32 bg-slate-900">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            <div className="space-y-12">
+              <div className="text-center space-y-4">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+                  {translations[locale].whoWeAre.title}
+                </h2>
+              </div>
 
-              <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
-                <span className="text-white">Solutions Numériques</span>
-                <br />
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Complètes
-                </span>
+              <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
+                <p>
+                  {translations[locale].whoWeAre.intro}
+                </p>
+
+                <p className="font-medium text-white">{translations[locale].whoWeAre.partnerTitle}</p>
+
+                <ul className="space-y-3 list-none">
+                  {translations[locale].whoWeAre.requirements.map((req, index) => (
+                    <li key={index} className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-400 mr-3 mt-1 flex-shrink-0" />
+                      <span>{req}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="pt-4 font-medium text-white whitespace-pre-line">
+                  {translations[locale].whoWeAre.closing}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Platform Lifecycle Engineering Section */}
+        <section id="services" className="py-20 lg:py-32 bg-slate-950">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {translations[locale].platformLifecycle.title}
               </h2>
-
-              <p className="text-xl text-slate-300 leading-relaxed">
-                Du concept au déploiement, nous fournissons des solutions numériques de bout en bout qui stimulent
-                l'innovation et accélèrent la croissance de votre entreprise.
+              <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+                {translations[locale].platformLifecycle.subtitle}
               </p>
             </div>
 
-            {/* Services Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {services.map((service, index) => (
-                <Card
-                  key={index}
-                  className="group relative overflow-hidden border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                >
-                  {/* Gradient Border */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-r ${service.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                  >
-                    <div className="absolute inset-[1px] bg-slate-800 rounded-lg"></div>
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+              {/* Block 1 - BUILD */}
+              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
+                <CardContent className="p-8 lg:p-10 space-y-6">
+                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+                    <Layers className="h-8 w-8 text-white" />
                   </div>
 
-                  <CardContent className="relative p-8 space-y-6">
-                    {/* Icon */}
-                    <div
-                      className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${service.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <service.icon className="h-8 w-8 text-white" />
-                    </div>
+                  <div className="space-y-4">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
+                      {translations[locale].platformLifecycle.build.title}
+                    </h3>
 
-                    {/* Content */}
-                    <div className="space-y-4">
-                      <h3 className="text-2xl font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">
-                        {service.title}
-                      </h3>
+                    <p className="text-slate-300 leading-relaxed text-lg">
+                      {translations[locale].platformLifecycle.build.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-                      <p className="text-slate-300 leading-relaxed">{service.description}</p>
+              {/* Block 2 - TAKE OVER & OPTIMIZE */}
+              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
+                <CardContent className="p-8 lg:p-10 space-y-6">
+                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
+                    <TrendingUp className="h-8 w-8 text-white" />
+                  </div>
 
-                      <ul className="space-y-2">
-                        {service.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center text-sm text-slate-400">
-                            <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
+                  <div className="space-y-4">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
+                      {translations[locale].platformLifecycle.takeOver.title}
+                    </h3>
 
-                      <Button
-                        variant="ghost"
-                        className="group/btn p-0 h-auto text-blue-400 hover:text-purple-400 font-semibold"
-                      >
-                        En Savoir Plus
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <p className="text-slate-300 leading-relaxed text-lg mb-4">
+                      {translations[locale].platformLifecycle.takeOver.intro}
+                    </p>
+
+                    <ul className="space-y-2 text-slate-300">
+                      {translations[locale].platformLifecycle.takeOver.items.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Block 3 - OPERATE & SCALE */}
+              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
+                <CardContent className="p-8 lg:p-10 space-y-6">
+                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
+                    <Server className="h-8 w-8 text-white" />
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
+                      {translations[locale].platformLifecycle.operate.title}
+                    </h3>
+
+                    <p className="text-slate-300 leading-relaxed text-lg mb-4">
+                      {translations[locale].platformLifecycle.operate.intro}
+                    </p>
+
+                    <ul className="space-y-2 text-slate-300">
+                      {translations[locale].platformLifecycle.operate.items.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* CTA */}
-            <div className="text-center mt-16">
-              <Dialog open={isConsultationModalOpen} onOpenChange={setIsConsultationModalOpen}>
+            <div className="text-center mt-12">
+              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
                 <DialogTrigger asChild>
                   <Button
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
                   >
-                    Discuter de Votre Projet
+                    {translations[locale].platformLifecycle.cta}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </DialogTrigger>
@@ -510,188 +998,31 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Products Section */}
-        <section id="products" className="py-20 lg:py-32 bg-gradient-to-br from-slate-950 to-slate-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="text-center max-w-4xl mx-auto mb-16 lg:mb-24">
-              <Badge className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 text-purple-300 border-purple-800 mb-6">
-                Nos Produits
-              </Badge>
-
-              <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
-                <span className="text-white">Solutions</span>
-                <br />
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Propriétaires
-                </span>
+        {/* How We Work Section */}
+        <section className="py-20 lg:py-32 bg-slate-900">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {translations[locale].howWeWork.title}
               </h2>
-
-              <p className="text-xl text-slate-300 leading-relaxed">
-                Découvrez nos produits innovants conçus pour résoudre des défis commerciaux complexes et stimuler la
-                transformation numérique.
-              </p>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                {
-                  name: "RevoFresh",
-                  description:
-                    "Gestion pour salons de beauté et barbershops centrée sur le rendez-vous uniquement—planning, rappels et fidélité.",
-                  features: [
-                    "Agenda en ligne et rappels SMS",
-                    "Gestion des stylistes et ressources",
-                    "Historique clients et fidélité",
-                  ],
-                  gradient: "from-rose-500 to-fuchsia-500",
-                  icon: Scissors,
-                },
-                {
-                  name: "Revoay",
-                  description:
-                    "Super‑app de services à la demande : réservation, paiement et suivi dans une expérience unifiée.",
-                  features: [
-                    "Modules transport/livraison",
-                    "Paiements intégrés et wallet",
-                    "Suivi temps réel et notifications",
-                  ],
-                  gradient: "from-sky-500 to-indigo-500",
-                  icon: Wallet,
-                },
-                {
-                  name: "RevEnts",
-                  description:
-                    "Planification et gestion d'événements pour promoteurs : publiez vos événements et vendez des billets en ligne en toute simplicité.",
-                  features: [
-                    "Billetterie en ligne sécurisée",
-                    "Tableaux de bord des ventes",
-                    "Scanner de billets et contrôle d'accès",
-                  ],
-                  gradient: "from-indigo-500 to-blue-500",
-                  icon: Ticket,
-                },
-                {
-                  name: "RevoShop",
-                  description:
-                    "Constructeur de boutique personnalisée pour créer votre e-commerce sur mesure sans compromis sur la performance.",
-                  features: [
-                    "Thèmes et blocs modulaires",
-                    "Paiements et logistique intégrés",
-                    "Catalogue et stocks avancés",
-                  ],
-                  gradient: "from-emerald-500 to-teal-500",
-                  icon: Store,
-                },
-                {
-                  name: "Nuvann",
-                  description:
-                    "Marketplace clé en main pour connecter vendeurs et acheteurs avec des flux de paiement sécurisés.",
-                  features: [
-                    "Onboarding vendeurs",
-                    "Escrow et split de paiements",
-                    "Ratings et arbitrage",
-                  ],
-                  gradient: "from-fuchsia-500 to-pink-500",
-                  icon: Users,
-                },
-                {
-                  name: "RevoSchool",
-                  description:
-                    "Suite complète de gestion scolaire : admissions, présences, notes, facturation et communication.",
-                  features: [
-                    "Portails parents/élèves",
-                    "Planification et évaluations",
-                    "Comptabilité et facturation",
-                  ],
-                  gradient: "from-amber-500 to-orange-500",
-                  icon: GraduationCap,
-                },
-                {
-                  name: "RevoKlas",
-                  description:
-                    "Plateforme d'apprentissage en ligne type Udemy pour créer, vendre et suivre des cours.",
-                  features: [
-                    "Création de cours multimédia",
-                    "Quizzes et certificats",
-                    "Monétisation et coupons",
-                  ],
-                  gradient: "from-cyan-500 to-sky-500",
-                  icon: BookOpen,
-                },
-                {
-                  name: "RevoCRM",
-                  description:
-                    "Plateforme de gestion de la relation client de niveau entreprise avec analyses pilotées par IA et flux de travail automatisés.",
-                  features: ["Scoring Avancé des Prospects", "Prévisions de Ventes", "Automatisation des Campagnes"],
-                  gradient: "from-blue-500 to-cyan-500",
-                  icon: BarChart3,
-                },
-                {
-                  name: "RevoAnalytics",
-                  description:
-                    "Plateforme complète d'intelligence d'affaires exploitant l'apprentissage automatique pour des insights prédictifs.",
-                  features: ["Analyses Prédictives", "Tableaux de Bord Exécutifs", "Visualisation de Données"],
-                  gradient: "from-purple-500 to-pink-500",
-                  icon: BarChart3,
-                },
-                {
-                  name: "RevoFin",
-                  description:
-                    "Écosystème sophistiqué de gestion financière avec automatisation comptable complète et conformité.",
-                  features: ["Rapports Financiers", "Gestion de Conformité", "Optimisation Budgétaire"],
-                  gradient: "from-green-500 to-emerald-500",
-                  icon: Wallet,
-                },
-                {
-                  name: "RevoFood",
-                  description:
-                    "Solution intégrée de gestion hôtelière pour un contrôle et une optimisation opérationnels de bout en bout.",
-                  features: ["Optimisation Chaîne d'Approvisionnement", "Analyses de Revenus", "Fidélité Client"],
-                  gradient: "from-orange-500 to-red-500",
-                  icon: Utensils,
-                },
-              ].map((product, index) => (
-                <Card
-                  key={index}
-                  className="group relative overflow-hidden border-0 bg-slate-800 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                >
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${product.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}
-                  ></div>
-
-                  <CardContent className="relative p-8 space-y-6 h-full flex flex-col">
-                    <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${product.gradient} shadow-lg self-start`}>
-                      {product.icon ? (
-                        <product.icon className="h-6 w-6 text-white" />
-                      ) : (
-                        <Award className="h-6 w-6 text-white" />
-                      )}
+                { icon: Layers, ...translations[locale].howWeWork.principles[0] },
+                { icon: TrendingUp, ...translations[locale].howWeWork.principles[1] },
+                { icon: Shield, ...translations[locale].howWeWork.principles[2] },
+                { icon: Code, ...translations[locale].howWeWork.principles[3] },
+                { icon: Zap, ...translations[locale].howWeWork.principles[4] },
+                { icon: Database, ...translations[locale].howWeWork.principles[5] },
+              ].map((principle, index) => (
+                <Card key={index} className="border-0 bg-slate-800/50 shadow-lg">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600">
+                      <principle.icon className="h-6 w-6 text-white" />
                     </div>
-
-                    <div className="space-y-4 flex-1">
-                      <h3 className="text-2xl font-bold text-white">{product.name}</h3>
-
-                      <p className="text-slate-300 leading-relaxed">{product.description}</p>
-
-                      <ul className="space-y-2">
-                        {product.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center text-sm text-slate-400">
-                            <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full group/btn border-2 hover:border-transparent hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transition-all duration-300 bg-transparent"
-                    >
-                      En Savoir Plus
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </Button>
+                    <h3 className="text-xl font-bold text-white">{principle.title}</h3>
+                    <p className="text-slate-300">{principle.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -699,134 +1030,272 @@ export default function LandingPage() {
           </div>
         </section>
 
-        
-
-        {/* Testimonials Section */}
-        <section className="py-20 lg:py-32 bg-slate-900" suppressHydrationWarning>
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="text-center max-w-4xl mx-auto mb-16 lg:mb-24">
-              <Badge className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 text-yellow-300 border-yellow-800 mb-6">
-                Succès Clients
-              </Badge>
-
-              <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
-                <span className="text-white">Ce Que Disent</span>
-                <br />
-                <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                  Nos Clients
-                </span>
+        {/* Industries Section */}
+        <section id="industries" className="py-20 lg:py-32 bg-slate-950">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {translations[locale].industries.title}
               </h2>
+            </div>
 
-              <p className="text-xl text-slate-300 leading-relaxed">
-                Ne nous croyez pas sur parole. Voici ce que les leaders de l'industrie disent de notre travail et de
-                notre partenariat.
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                { icon: Building2, ...translations[locale].industries.items[0] },
+                { icon: TrendingUp, ...translations[locale].industries.items[1] },
+                { icon: Server, ...translations[locale].industries.items[2] },
+                { icon: Zap, ...translations[locale].industries.items[3] },
+              ].map((industry, index) => (
+                <Card key={index} className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
+                  <CardContent className="p-8 space-y-4">
+                    <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+                      <industry.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{industry.title}</h3>
+                    <p className="text-slate-300 leading-relaxed">{industry.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
+                  >
+                    {translations[locale].industries.cta}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
+            </div>
+          </div>
+        </section>
+
+        {/* Clients & Partners Section */}
+        <section className="py-20 lg:py-32 bg-slate-900">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {translations[locale].clients.title}
+              </h2>
+              <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+                {translations[locale].clients.copy}
               </p>
             </div>
 
-            {/* Testimonials Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {testimonials.map((testimonial, index) => (
-                <Card
-                  key={index}
-                  className="group relative overflow-hidden border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                >
-                  <CardContent className="p-8 space-y-6">
-                    {/* Rating */}
-                    <div className="flex space-x-1">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-
-                    {/* Content */}
-                    <blockquote className="text-slate-300 leading-relaxed italic">"{testimonial.content}"</blockquote>
-
-                    {/* Author */}
-                    <div className="flex items-center space-x-4">
-                      <Image
-                        src={testimonial.avatar || "/placeholder.svg"}
-                        width={48}
-                        height={48}
-                        alt={testimonial.name}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <div className="font-semibold text-white">{testimonial.name}</div>
-                        <div className="text-sm text-slate-400">{testimonial.role}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <TooltipProvider>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+                {clients.map((client, index) => (
+                  <Tooltip key={index}>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={client.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex flex-col items-center justify-center p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
+                      >
+                        <div className="w-full h-20 flex items-center justify-center">
+                          <div className="text-2xl lg:text-3xl font-bold text-slate-300 group-hover:text-white transition-colors duration-300">
+                            {client.name}
+                          </div>
+                        </div>
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-slate-800 border-slate-700 text-white">
+                      <p className="font-medium">{client.name}</p>
+                      <p className="text-sm text-slate-300 mt-1">{client.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section
-          id="contact"
-          className="py-20 lg:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden"
-        >
-          {/* Background Elements */}
-          <div className="absolute inset-0" suppressHydrationWarning>
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('/placeholder.svg?height=800&width=1200&text=Pattern')] opacity-10"></div>
+        {/* Final CTA Section */}
+        <section id="contact" className="py-20 lg:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden">
+          <div className="absolute inset-0">
             <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
           </div>
 
-          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white">
-                Prêt à Transformer
-                <br />
-                <span className="text-blue-200">Votre Entreprise ?</span>
+          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
+            <div className="space-y-8">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white">
+                {translations[locale].finalCta.title}
               </h2>
 
-              <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto">
-                Discutons de la façon dont nos solutions innovantes peuvent accélérer votre transformation numérique et
-                stimuler une croissance durable.
+              <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-2xl mx-auto">
+                {translations[locale].finalCta.subtitle}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="lg"
-                      className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                    >
-                      Démarrer Votre Projet
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
-
-                <Dialog open={isConsultationModalOpen} onOpenChange={setIsConsultationModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-8 py-6 bg-transparent"
-                    >
-                      Programmer une Consultation
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
+              <div className="max-w-2xl mx-auto space-y-4 pt-4">
+                <p className="text-lg text-blue-100 leading-relaxed">
+                  {translations[locale].finalCta.trust}
+                </p>
               </div>
 
-              <div className="pt-8 text-blue-200">
-                <p className="text-sm">✨ Consultation gratuite • 🚀 Réponse rapide • 💼 Solutions sur mesure</p>
-              </div>
+              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    size="lg"
+                    className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                  >
+                    {translations[locale].finalCta.button}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-white">
+                      {selectedInterest === "NEW_PLATFORM"
+                        ? translations[locale].contact.title.newPlatform
+                        : selectedInterest === "PLATFORM_TAKEOVER"
+                        ? translations[locale].contact.title.takeover
+                        : selectedInterest === "PLATFORM_MAINTENANCE"
+                        ? translations[locale].contact.title.maintenance
+                        : selectedInterest === "INFRASTRUCTURE_HOSTING"
+                        ? translations[locale].contact.title.hosting
+                        : selectedInterest === "PARTNERSHIP"
+                        ? translations[locale].contact.title.partnership
+                        : translations[locale].contact.title.default}
+                    </DialogTitle>
+                    <DialogDescription className="text-base text-slate-300">
+                      {translations[locale].contact.description}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <form onSubmit={handleContactSubmit} className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-slate-200 font-medium">
+                          {translations[locale].contact.fields.name} *
+                        </Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          placeholder="John Doe"
+                          required
+                          className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-slate-200 font-medium">
+                          {translations[locale].contact.fields.email} *
+                        </Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="john@company.com"
+                          required
+                          className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="company" className="text-slate-200 font-medium">
+                        {translations[locale].contact.fields.company}
+                      </Label>
+                      <Input
+                        id="company"
+                        name="company"
+                        placeholder="Your Company"
+                        className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="productInterest" className="text-slate-200 font-medium">
+                        {translations[locale].contact.fields.need} *
+                      </Label>
+                      <Select name="productInterest" value={selectedInterest} onValueChange={setSelectedInterest}>
+                        <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
+                          <SelectValue placeholder={translations[locale].contact.fields.needPlaceholder} className="text-slate-400" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600">
+                          <SelectItem value="NEW_PLATFORM" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.newPlatform}
+                          </SelectItem>
+                          <SelectItem value="PLATFORM_TAKEOVER" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.takeover}
+                          </SelectItem>
+                          <SelectItem value="PLATFORM_MAINTENANCE" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.maintenance}
+                          </SelectItem>
+                          <SelectItem value="INFRASTRUCTURE_HOSTING" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.hosting}
+                          </SelectItem>
+                          <SelectItem value="PARTNERSHIP" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.partnership}
+                          </SelectItem>
+                          <SelectItem value="GENERAL_INQUIRY" className="text-white hover:bg-slate-700">
+                            {translations[locale].contact.options.general}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-slate-200 font-medium">
+                        {translations[locale].contact.fields.message} *
+                      </Label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        placeholder={translations[locale].contact.fields.messagePlaceholder}
+                        required
+                        className="min-h-[120px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                      />
+                    </div>
+
+                    <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
+
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsContactOpen(false)}
+                        className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+                        disabled={isSubmitting}
+                      >
+                        {translations[locale].contact.buttons.cancel}
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                        disabled={isSubmitting || !selectedInterest}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            {translations[locale].contact.buttons.sending}
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />
+                            {translations[locale].contact.buttons.send}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950 text-white py-16">
+      <footer className="bg-slate-950 text-white py-16 border-t border-slate-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Brand */}
             <div className="space-y-4">
               <Link href="/" className="flex items-center space-x-2">
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg">
@@ -837,510 +1306,65 @@ export default function LandingPage() {
                 </span>
               </Link>
               <p className="text-slate-400 leading-relaxed">
-                Transformer les entreprises grâce à des solutions numériques innovantes et une technologie de pointe.
+                {translations[locale].footer.description}
               </p>
             </div>
 
-            {/* Services */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Services</h3>
+              <h3 className="text-lg font-semibold">{translations[locale].footer.services}</h3>
               <ul className="space-y-2 text-slate-400">
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Développement Mobile
+                  <Link href="#services" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.customPlatforms}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Développement Web
+                  <Link href="#services" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.platformEngineering}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    E-Commerce
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Solutions Cloud
+                  <Link href="#services" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.infrastructure}
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Company */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Entreprise</h3>
+              <h3 className="text-lg font-semibold">{translations[locale].footer.company}</h3>
               <ul className="space-y-2 text-slate-400">
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    À Propos
+                  <Link href="#approach" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.ourApproach}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Carrières
+                  <Link href="#industries" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.industries}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Contact
+                  <Link href="#contact" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.contact}
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Contact */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Nous Contacter</h3>
+              <h3 className="text-lg font-semibold">{translations[locale].footer.contact}</h3>
               <div className="space-y-2 text-slate-400">
-                <p>bonjour@revosso.com</p>
-                <p>+33 1 23 45 67 89</p>
-                <p>Paris, France</p>
+                <p>contact@revosso.com</p>
               </div>
             </div>
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Revosso. Tous droits réservés.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Politique de Confidentialité
-              </Link>
-              <Link href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Conditions d'Utilisation
-              </Link>
-              <Link href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Politique des Cookies
-              </Link>
-            </div>
+            <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Revosso. {translations[locale].footer.copyright}</p>
           </div>
         </div>
       </footer>
-
-      {/* Project Modal */}
-      <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-2xl font-bold text-white">
-              <Rocket className="mr-3 h-6 w-6 text-blue-400" />
-              Démarrer Votre Projet
-            </DialogTitle>
-            <DialogDescription className="text-base text-slate-300">
-              Parlez-nous de votre projet et nous vous recontacterons dans les 24 heures avec une proposition détaillée.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleProjectSubmit} className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-slate-200 font-medium">
-                  Nom Complet *
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Jean Dupont"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-200 font-medium">
-                  Adresse Email *
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="jean@entreprise.com"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="company" className="text-slate-200 font-medium">
-                Nom de l'Entreprise
-              </Label>
-              <Input
-                id="company"
-                name="company"
-                placeholder="Votre Entreprise SARL"
-                className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-slate-200 font-medium">
-                Types de Projet * (Sélectionnez tous ceux qui s'appliquent)
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-slate-800 rounded-lg border border-slate-600">
-                {projectTypes.map((type) => (
-                  <div key={type.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={type.id}
-                      checked={selectedProjectTypes.includes(type.id)}
-                      onCheckedChange={(checked) => handleProjectTypeChange(type.id, checked as boolean)}
-                      className="border-slate-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                    />
-                    <Label
-                      htmlFor={type.id}
-                      className="text-sm text-slate-300 cursor-pointer hover:text-white transition-colors"
-                    >
-                      {type.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              {selectedProjectTypes.length === 0 && (
-                <p className="text-sm text-red-400">Veuillez sélectionner au moins un type de projet</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="budget" className="text-slate-200 font-medium">
-                Fourchette de Budget
-              </Label>
-              <Select name="budget">
-                <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                  <SelectValue placeholder="Sélectionner la fourchette de budget" className="text-slate-400" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="10k-25k" className="text-white hover:bg-slate-700">
-                    $10k - $25k
-                  </SelectItem>
-                  <SelectItem value="25k-50k" className="text-white hover:bg-slate-700">
-                    $25k - $50k
-                  </SelectItem>
-                  <SelectItem value="50k-100k" className="text-white hover:bg-slate-700">
-                    $50k - $100k
-                  </SelectItem>
-                  <SelectItem value="100k-250k" className="text-white hover:bg-slate-700">
-                    $100k - $250k
-                  </SelectItem>
-                  <SelectItem value="250k+" className="text-white hover:bg-slate-700">
-                    $250k+
-                  </SelectItem>
-                  <SelectItem value="discuss" className="text-white hover:bg-slate-700">
-                    À Discuter
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="timeline" className="text-slate-200 font-medium">
-                Délai Préféré
-              </Label>
-              <Select name="timeline">
-                <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                  <SelectValue placeholder="Quand avez-vous besoin que ce soit terminé ?" className="text-slate-400" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="asap" className="text-white hover:bg-slate-700">
-                    Dès que possible
-                  </SelectItem>
-                  <SelectItem value="1-3months" className="text-white hover:bg-slate-700">
-                    1-3 mois
-                  </SelectItem>
-                  <SelectItem value="3-6months" className="text-white hover:bg-slate-700">
-                    3-6 mois
-                  </SelectItem>
-                  <SelectItem value="6-12months" className="text-white hover:bg-slate-700">
-                    6-12 mois
-                  </SelectItem>
-                  <SelectItem value="flexible" className="text-white hover:bg-slate-700">
-                    Flexible
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-slate-200 font-medium">
-                Description du Projet *
-              </Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Veuillez décrire votre projet, vos objectifs, votre public cible et toute exigence spécifique..."
-                required
-                className="min-h-[120px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-
-            <div className="bg-slate-800 border border-slate-700 p-4 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
-                </div>
-                <div className="text-sm text-slate-300">
-                  <p className="font-medium mb-1 text-white">Prochaines étapes :</p>
-                  <ul className="space-y-1 text-slate-400">
-                    <li>• Nous examinerons les détails de votre projet dans les 24 heures</li>
-                    <li>• Programmer un appel de découverte pour discuter des exigences</li>
-                    <li>• Fournir une proposition détaillée avec calendrier et tarification</li>
-                    <li>• Commencer le développement une fois approuvé</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsProjectModalOpen(false)
-                  setSelectedProjectTypes([])
-                }}
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-                disabled={isSubmitting || selectedProjectTypes.length === 0}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Envoi en cours...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Soumettre le Projet
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Consultation Modal */}
-      <Dialog open={isConsultationModalOpen} onOpenChange={setIsConsultationModalOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-2xl font-bold text-white">
-              <CalendarIcon className="mr-3 h-6 w-6 text-blue-400" />
-              Programmer une Consultation
-            </DialogTitle>
-            <DialogDescription className="text-base text-slate-300">
-              Réservez une consultation gratuite de 30 minutes pour discuter de votre projet et explorer comment nous
-              pouvons vous aider.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleConsultationSubmit} className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="cons-name" className="text-slate-200 font-medium">
-                  Nom Complet *
-                </Label>
-                <Input
-                  id="cons-name"
-                  name="name"
-                  placeholder="Jean Dupont"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cons-email" className="text-slate-200 font-medium">
-                  Adresse Email *
-                </Label>
-                <Input
-                  id="cons-email"
-                  name="email"
-                  type="email"
-                  placeholder="jean@entreprise.com"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="cons-company" className="text-slate-200 font-medium">
-                  Nom de l'Entreprise
-                </Label>
-                <Input
-                  id="cons-company"
-                  name="company"
-                  placeholder="Votre Entreprise SARL"
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cons-phone" className="text-slate-200 font-medium">
-                  Numéro de Téléphone
-                </Label>
-                <Input
-                  id="cons-phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+33 1 23 45 67 89"
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cons-service" className="text-slate-200 font-medium">
-                Service d'Intérêt
-              </Label>
-              <Select name="service">
-                <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                  <SelectValue placeholder="Quel service vous intéresse ?" className="text-slate-400" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="mobile" className="text-white hover:bg-slate-700">
-                    Développement Mobile
-                  </SelectItem>
-                  <SelectItem value="web" className="text-white hover:bg-slate-700">
-                    Développement Web
-                  </SelectItem>
-                  <SelectItem value="ecommerce" className="text-white hover:bg-slate-700">
-                    Solutions E-Commerce
-                  </SelectItem>
-                  <SelectItem value="enterprise" className="text-white hover:bg-slate-700">
-                    Logiciels d'Entreprise
-                  </SelectItem>
-                  <SelectItem value="cloud" className="text-white hover:bg-slate-700">
-                    Infrastructure Cloud
-                  </SelectItem>
-                  <SelectItem value="design" className="text-white hover:bg-slate-700">
-                    Design UI/UX
-                  </SelectItem>
-                  <SelectItem value="consultation" className="text-white hover:bg-slate-700">
-                    Consultation Générale
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-slate-200 font-medium">Date Préférée *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`h-12 w-full justify-start text-left font-normal bg-slate-800 border-slate-600 hover:bg-slate-700 ${
-                        !selectedDate ? "text-slate-400" : "text-white"
-                      }`}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP", { locale: fr }) : "Choisir une date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-600">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                      initialFocus
-                      className="bg-slate-800 text-white"
-                      locale={fr}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cons-time" className="text-slate-200 font-medium">
-                  Heure Préférée *
-                </Label>
-                <Select name="time" required>
-                  <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                    <SelectValue placeholder="Sélectionner un créneau horaire" className="text-slate-400" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-600">
-                    {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time} className="text-white hover:bg-slate-700">
-                        <div className="flex items-center">
-                          <Clock className="mr-2 h-4 w-4" />
-                          {time}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cons-message" className="text-slate-200 font-medium">
-                Informations Supplémentaires
-              </Label>
-              <Textarea
-                id="cons-message"
-                name="message"
-                placeholder="Parlez-nous davantage de votre projet ou de tout sujet spécifique que vous aimeriez discuter..."
-                className="min-h-[100px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-
-            <div className="bg-slate-800 border border-slate-700 p-4 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
-                </div>
-                <div className="text-sm text-slate-300">
-                  <p className="font-medium mb-1 text-white">À quoi s'attendre :</p>
-                  <ul className="space-y-1 text-slate-400">
-                    <li>• Appel vidéo de 30 minutes avec notre équipe d'experts</li>
-                    <li>• Évaluation du projet et recommandations</li>
-                    <li>• Estimation du calendrier et du budget</li>
-                    <li>• Discussion des prochaines étapes</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsConsultationModalOpen(false)}
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-                disabled={isSubmitting || !selectedDate}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Réservation...
-                  </>
-                ) : (
-                  <>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    Réserver la Consultation
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

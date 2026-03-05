@@ -6,10 +6,9 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Revosso - Revolutionary Software Solutions",
+  title: "Revosso - Digital Infrastructure & Platform Engineering",
   description:
-    "Transforming ideas into powerful digital solutions. Mobile, web, e-commerce, on-demand platforms, and cloud hosting.",
-    generator: 'v0.app'
+    "Revosso designs and builds secure, high-performance digital infrastructure and custom software systems engineered for long-term growth.",
 }
 
 export default function RootLayout({
