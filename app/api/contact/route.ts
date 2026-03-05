@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/db"
-import { leads } from "@/lib/schema"
-import { contactSchema } from "@/lib/validation"
+import { leadSubmissionSchema } from "@/lib/validation"
 import { checkRateLimit } from "@/lib/rateLimit"
-import { sendInternalNotification, sendConfirmationEmail } from "@/lib/mail"
-import { nanoid } from "nanoid"
+import { leadsService } from "@/lib/services/leads-service"
+
+/**
+ * Lead Capture API Endpoint
+ * 
+ * Architecture: API Layer -> Service Layer -> Repository Layer -> Database
+ * 
+ * This endpoint MUST NOT contain database queries.
+ * All database access goes through the service layer.
+ */
 
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for")
@@ -17,18 +23,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate input
-    const validationResult = contactSchema.safeParse(body)
+    const validationResult = leadSubmissionSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Validation échouée", details: validationResult.error.errors },
+        { error: "Validation failed", details: validationResult.error.errors },
         { status: 400 }
       )
     }
 
     const data = validationResult.data
 
-    // Check honeypot
+    // Check honeypot (spam protection)
     if (data.honeypot && data.honeypot.length > 0) {
+      console.log("Honeypot triggered - potential spam")
+      // Return success to not reveal honeypot to bots
       return NextResponse.json({ success: true }, { status: 200 })
     }
 
@@ -37,48 +45,45 @@ export async function POST(request: NextRequest) {
     const rateLimit = checkRateLimit(ip)
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Trop de requêtes. Veuillez réessayer plus tard." },
+        { error: "Too many requests. Please try again later." },
         { status: 429 }
       )
     }
 
-    // Insert into database
-    const leadId = nanoid()
-    const referrer = request.headers.get("referer") || "direct"
-    const environment = process.env.NODE_ENV || "production"
-    
-    const lead = {
-      id: leadId,
-      name: data.name,
-      email: data.email,
-      company: data.company || null,
-      message: data.message,
-      productInterest: data.productInterest || null,
-      source: `${data.source || "homepage"}|${environment}|${referrer}`,
-      status: "NEW",
-      createdAt: new Date(),
+    // Capture request metadata
+    const userAgent = request.headers.get("user-agent") || undefined
+
+    // Call service layer to create lead
+    // Service handles: database insert, emails, status updates
+    const result = await leadsService.createLead({
+      data,
+      ipAddress: ip,
+      userAgent,
+    })
+
+    if (!result.success) {
+      console.error(`Failed to create lead: ${result.error}`)
+      return NextResponse.json(
+        { error: "Failed to process your request" },
+        { status: 500 }
+      )
     }
 
-    await db.insert(leads).values(lead)
+    console.log(`Lead ${result.leadId} created successfully`)
 
-    // Send emails (don't fail if email fails)
-    try {
-      await sendInternalNotification({ ...data, id: leadId, source: lead.source || undefined })
-    } catch (error) {
-      console.error("Failed to send internal notification:", error)
-    }
-
-    try {
-      await sendConfirmationEmail(data)
-    } catch (error) {
-      console.error("Failed to send confirmation email:", error)
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 })
-  } catch (error) {
-    console.error("Error processing contact form:", error)
+    // Return success even if emails failed
+    // The lead is safely stored in the database
     return NextResponse.json(
-      { error: "Erreur lors du traitement de votre demande" },
+      { 
+        success: true,
+        leadId: result.leadId,
+      },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error("Error processing lead submission:", error)
+    return NextResponse.json(
+      { error: "An unexpected error occurred" },
       { status: 500 }
     )
   }
