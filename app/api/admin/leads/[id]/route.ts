@@ -58,25 +58,66 @@ export const PATCH = withAdminAuth(async (request, context, user) => {
     }
 
     const body = await request.json();
-    const { status } = body;
-    
-    if (!status || !['new', 'contacted', 'qualified', 'closed'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status. Must be: new, contacted, qualified, or closed' },
-        { status: 400 }
-      );
+    const { status, notes } = body;
+
+    const validStatuses = ['new', 'contacted', 'qualified', 'closed', 'converted'];
+
+    if (status !== undefined) {
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json(
+          { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
+          { status: 400 }
+        );
+      }
+      await leadsService.updateLeadStatus(id as string, status);
     }
 
-    await leadsService.updateLeadStatus(id as string, status);
+    if (notes !== undefined) {
+      await leadsService.updateLeadNotes(id as string, notes || null);
+    }
     
     return NextResponse.json({
       success: true,
-      message: 'Lead status updated successfully',
+      message: 'Lead updated successfully',
     });
   } catch (error) {
     console.error('Failed to update lead:', error);
     return NextResponse.json(
       { error: 'Failed to update lead' },
+      { status: 500 }
+    );
+  }
+});
+
+export const DELETE = withAdminAuth(async (request, context, user) => {
+  try {
+    const id = context.params?.id;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Lead ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const lead = await leadsService.getLeadById(id as string);
+    if (!lead) {
+      return NextResponse.json(
+        { error: 'Lead not found' },
+        { status: 404 }
+      );
+    }
+
+    await leadsService.deleteLead(id as string);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Lead deleted successfully',
+    });
+  } catch (error) {
+    console.error('Failed to delete lead:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete lead' },
       { status: 500 }
     );
   }

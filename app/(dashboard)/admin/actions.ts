@@ -6,64 +6,40 @@ import type { Lead } from "@/lib/schema"
 
 /**
  * Server Actions for Admin Lead Management
- * 
- * These actions allow admin pages to interact with the lead system
- * without direct database access. All actions require authentication
- * and validate the Auth0 audience.
- * 
- * Architecture: UI -> Server Actions -> Service Layer -> Repository -> Database
+ *
+ * Architecture: UI → Server Actions → Service Layer → Repository → Database
+ * All actions require admin authentication.
  */
 
 export async function getLeadsAction(): Promise<Lead[]> {
-  try {
-    // Require authentication with audience validation
-    await requireAuth()
-    return await leadsService.getAllLeads()
-  } catch (error) {
-    console.error("Failed to fetch leads:", error)
-    throw new Error("Failed to fetch leads")
-  }
+  await requireAuth()
+  return await leadsService.getAllLeads()
 }
 
 export async function getLeadByIdAction(id: string): Promise<Lead | undefined> {
-  try {
-    await requireAuth()
-    return await leadsService.getLeadById(id)
-  } catch (error) {
-    console.error(`Failed to fetch lead ${id}:`, error)
-    throw new Error("Failed to fetch lead")
-  }
+  await requireAuth()
+  return await leadsService.getLeadById(id)
 }
 
 export async function updateLeadStatusAction(
   id: string,
-  status: "new" | "contacted" | "qualified" | "closed"
+  status: "new" | "contacted" | "qualified" | "closed" | "converted"
 ): Promise<void> {
-  try {
-    await requireAuth()
-    await leadsService.updateLeadStatus(id, status)
-  } catch (error) {
-    console.error(`Failed to update lead ${id} status:`, error)
-    throw new Error("Failed to update lead status")
-  }
+  await requireAuth()
+  await leadsService.updateLeadStatus(id, status)
+}
+
+export async function updateLeadNotesAction(id: string, notes: string | null): Promise<void> {
+  await requireAuth()
+  await leadsService.updateLeadNotes(id, notes)
+}
+
+export async function deleteLeadAction(id: string): Promise<void> {
+  await requireAuth()
+  await leadsService.deleteLead(id)
 }
 
 export async function getLeadsByStatusAction(status: string): Promise<Lead[]> {
-  try {
-    await requireAuth()
-    return await leadsService.getLeadsByStatus(status)
-  } catch (error) {
-    console.error(`Failed to fetch leads by status:`, error)
-    throw new Error("Failed to fetch leads by status")
-  }
-}
-
-export async function getLeadsByProductAction(productInterest: string): Promise<Lead[]> {
-  try {
-    await requireAuth()
-    return await leadsService.getLeadsByProduct(productInterest)
-  } catch (error) {
-    console.error(`Failed to fetch leads by product:`, error)
-    throw new Error("Failed to fetch leads by product")
-  }
+  await requireAuth()
+  return await leadsService.getLeadsByStatus(status)
 }

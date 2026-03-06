@@ -13,7 +13,7 @@ import { visitorsService } from "@/lib/services/visitors-service"
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for")
   const realIP = request.headers.get("x-real-ip")
-  return forwarded?.split(",")[0] || "unknown"
+  return forwarded?.split(",")[0] || realIP || "unknown"
 }
 
 export async function POST(request: NextRequest) {

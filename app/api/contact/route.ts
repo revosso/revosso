@@ -22,6 +22,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    // Check honeypot BEFORE validation so bots always see a silent 200
+    if (body.honeypot && typeof body.honeypot === "string" && body.honeypot.length > 0) {
+      console.log("Honeypot triggered - potential spam")
+      return NextResponse.json({ success: true }, { status: 200 })
+    }
+
     // Validate input
     const validationResult = leadSubmissionSchema.safeParse(body)
     if (!validationResult.success) {
@@ -32,13 +38,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = validationResult.data
-
-    // Check honeypot (spam protection)
-    if (data.honeypot && data.honeypot.length > 0) {
-      console.log("Honeypot triggered - potential spam")
-      // Return success to not reveal honeypot to bots
-      return NextResponse.json({ success: true }, { status: 200 })
-    }
 
     // Rate limiting
     const ip = getClientIP(request)

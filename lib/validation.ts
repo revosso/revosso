@@ -17,8 +17,8 @@ export const leadSubmissionSchema = z.object({
   // System fields (captured from request)
   userLanguage: z.string().max(10).optional(),
   
-  // Spam protection
-  honeypot: z.string().max(0).optional(), // Must be empty
+  // Spam protection — checked in the API handler before validation runs
+  honeypot: z.string().optional(),
 })
 
 // Visitor tracking schema
@@ -31,17 +31,4 @@ export const visitorTrackingSchema = z.object({
 
 export type LeadSubmissionInput = z.infer<typeof leadSubmissionSchema>
 export type VisitorTrackingInput = z.infer<typeof visitorTrackingSchema>
-
-// Legacy support for existing contact form
-export const contactSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(100),
-  email: z.string().email("Adresse email invalide"),
-  company: z.string().max(200).optional(),
-  message: z.string().min(10, "Le message doit contenir au moins 10 caractères").max(2000),
-  productInterest: z.string().max(100).optional(),
-  source: z.string().max(200).optional(),
-  honeypot: z.string().max(0).optional(),
-})
-
-export type ContactInput = z.infer<typeof contactSchema>
 

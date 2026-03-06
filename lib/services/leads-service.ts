@@ -131,7 +131,7 @@ export class LeadsService {
    */
   async updateLeadStatus(
     id: string,
-    status: "new" | "contacted" | "qualified" | "closed"
+    status: "new" | "contacted" | "qualified" | "closed" | "converted"
   ): Promise<void> {
     await leadsRepository.updateLeadStatus(id, status)
   }
@@ -148,6 +148,20 @@ export class LeadsService {
    */
   async getLeadsByProduct(productInterest: string): Promise<Lead[]> {
     return await leadsRepository.getByProductInterest(productInterest)
+  }
+
+  /**
+   * Delete a lead permanently
+   */
+  async deleteLead(id: string): Promise<void> {
+    await leadsRepository.delete(id)
+  }
+
+  /**
+   * Update internal notes for a lead (follow-up tracking)
+   */
+  async updateLeadNotes(id: string, notes: string | null): Promise<void> {
+    await leadsRepository.updateNotes(id, notes)
   }
 }
 

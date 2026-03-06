@@ -176,13 +176,50 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
       try {
         const client = getAuth0Client();
 
-        // Detect an Auth0 redirect callback in the current URL.
         const search = window.location.search;
-        if (search.includes('code=') || search.includes('error=')) {
-          // Auth0 returned an error (e.g. "Callback URL mismatch").
-          // Extract it directly from the URL so we can surface a readable message.
-          if (search.includes('error=')) {
-            const params = new URLSearchParams(search);
+        const params = new URLSearchParams(search);
+
+        // Detect Auth0 Organization invitation parameters.
+        // When both are present the user has NOT yet joined the org — any
+        // silent-auth call (prompt=none) will be rejected with
+        // "user is not part of the organization".
+        // We must bypass all silent auth and force an interactive login that
+        // carries the invitation context so Auth0 can complete the membership.
+        const invitationParam = params.get('invitation');
+        const organizationParam = params.get('organization');
+        const isInvitationFlow = !!(invitationParam && organizationParam);
+
+        if (isInvitationFlow) {
+          // Remove invitation params from the URL to prevent a second redirect
+          // if the component re-mounts (React Strict Mode, HMR, etc.).
+          window.history.replaceState({}, document.title, window.location.pathname);
+
+          await client.loginWithRedirect({
+            authorizationParams: {
+              redirect_uri: getRedirectUri(),
+              audience: AUTH0_AUDIENCE,
+              scope: 'openid profile email',
+              invitation: invitationParam,
+              organization: organizationParam,
+              // Explicitly force an interactive login screen — this is what
+              // allows Auth0 to complete the org-membership grant.
+              prompt: 'login',
+            },
+          });
+          // loginWithRedirect navigates the browser away; code below never runs.
+          return;
+        }
+
+        // Detect an Auth0 redirect callback in the current URL.
+        // Auth0 ALWAYS includes a `state` parameter in its redirects (both success
+        // and error). Requiring `state=` prevents us from misidentifying custom
+        // query params (e.g. our own `?auth_error=...`) as Auth0 callbacks.
+        const isAuth0Callback =
+          params.has('state') && (params.has('code') || params.has('error'));
+
+        if (isAuth0Callback) {
+          // Auth0 returned an error (e.g. "Callback URL mismatch", "not in org").
+          if (params.has('error')) {
             const code = params.get('error') ?? 'unknown_error';
             const desc = params.get('error_description') ?? 'Auth0 authentication failed';
             // Remove the error params from the URL before throwing
@@ -283,6 +320,16 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
 
   // Get access token for API calls
   const getAccessToken = useCallback(async (): Promise<string | undefined> => {
+    // Never attempt silent token acquisition during an invitation flow.
+    // The user is not yet a member of the org, so prompt=none would be
+    // rejected before initAuth0 has a chance to redirect them.
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('invitation') && params.has('organization')) {
+        return undefined;
+      }
+    }
+
     try {
       const client = getAuth0Client();
       const token = await client.getTokenSilently({

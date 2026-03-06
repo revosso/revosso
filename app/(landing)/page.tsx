@@ -80,6 +80,28 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Show a toast when redirected back from a failed admin login attempt
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const authError = params.get("auth_error")
+    if (!authError) return
+
+    // Strip the param from the URL without a page reload
+    const clean = window.location.pathname
+    window.history.replaceState({}, document.title, clean)
+
+    const isOrgError =
+      authError.includes("not part of") || authError.includes("organization")
+
+    toast({
+      title: isOrgError ? "Access denied" : "Login failed",
+      description: isOrgError
+        ? "Your account doesn't have access to the admin dashboard."
+        : authError,
+      variant: "destructive",
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
@@ -108,8 +130,9 @@ export default function LandingPage() {
         | "INFRASTRUCTURE_HOSTING"
         | "PARTNERSHIP"
         | "GENERAL_INQUIRY",
-      source: "homepage",
-      honeypot: "",
+      sourcePage: "landing",
+      userLanguage: locale,
+      honeypot: (formData.get("honeypot") as string) || "",
     }
 
     try {

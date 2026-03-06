@@ -2,6 +2,7 @@ import { db } from "../db"
 import { leads, type NewLead, type Lead } from "../schema"
 import { desc, eq } from "drizzle-orm"
 
+
 /**
  * Leads Repository
  * 
@@ -45,7 +46,7 @@ export class LeadsRepository {
    */
   async updateLeadStatus(
     id: string,
-    status: "new" | "contacted" | "qualified" | "closed"
+    status: "new" | "contacted" | "qualified" | "closed" | "converted"
   ): Promise<void> {
     try {
       await db
@@ -120,6 +121,30 @@ export class LeadsRepository {
     } catch (error) {
       console.error("Database error fetching leads by product:", error)
       throw new Error("Failed to fetch leads by product")
+    }
+  }
+
+  /**
+   * Delete a lead by ID
+   */
+  async delete(id: string): Promise<void> {
+    try {
+      await db.delete(leads).where(eq(leads.id, id))
+    } catch (error) {
+      console.error("Database error deleting lead:", error)
+      throw new Error("Failed to delete lead")
+    }
+  }
+
+  /**
+   * Update internal notes for a lead
+   */
+  async updateNotes(id: string, notes: string | null): Promise<void> {
+    try {
+      await db.update(leads).set({ notes }).where(eq(leads.id, id))
+    } catch (error) {
+      console.error("Database error updating lead notes:", error)
+      throw new Error("Failed to update lead notes")
     }
   }
 }

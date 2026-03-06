@@ -17,7 +17,8 @@ export const leads = sqliteTable("leads", {
   
   // System fields
   emailStatus: text("email_status").notNull().default("pending"), // pending, sent, failed
-  leadStatus: text("lead_status").notNull().default("new"), // new, contacted, qualified, closed
+  leadStatus: text("lead_status").notNull().default("new"), // new, contacted, qualified, closed, converted
+  notes: text("notes"), // Internal follow-up notes
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userLanguage: text("user_language"),

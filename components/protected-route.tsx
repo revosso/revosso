@@ -88,27 +88,16 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
  * }
  */
 export function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated, user, error, loginWithRedirect } = useAuth0();
+  const { isLoading, isAuthenticated, error, loginWithRedirect } = useAuth0();
   const pathname = usePathname();
 
   useEffect(() => {
     if (isLoading) return;
-
-    // Do not attempt login if there is already an auth initialization error.
     if (error) return;
-
     if (!isAuthenticated) {
       loginWithRedirect({ appState: { returnTo: pathname } });
-    } else if (user) {
-      const roles: string[] =
-        (user as any)['https://revosso.com/roles'] ?? (user as any).roles ?? [];
-      if (!roles.includes('admin')) {
-        // Redirect to the landing page origin to avoid a redirect loop:
-        // on the dashboard domain, '/' → '/admin' via middleware.
-        window.location.href = `${getLandingOrigin()}/?error=unauthorized`;
-      }
     }
-  }, [isLoading, isAuthenticated, user, error, loginWithRedirect, pathname]);
+  }, [isLoading, isAuthenticated, error, loginWithRedirect, pathname]);
 
   if (isLoading) {
     return (
@@ -132,12 +121,7 @@ export function AdminProtectedRoute({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!isAuthenticated || !user) return null;
-
-  const roles: string[] =
-    (user as any)['https://revosso.com/roles'] ?? (user as any).roles ?? [];
-
-  if (!roles.includes('admin')) return null;
+  if (!isAuthenticated) return null;
 
   return <>{children}</>;
 }
