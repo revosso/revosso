@@ -9,6 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  allowedDevOrigins: ["revosso.local", "manage.revosso.local"],
 }
 
 export default nextConfig

@@ -3,31 +3,40 @@ import type { NextRequest } from 'next/server';
 
 /**
  * JWT Validation using Auth0 JWKS (Public Keys)
- * 
- * This module validates JWT tokens WITHOUT using a client secret.
- * It uses Auth0's public JWKS endpoint to verify token signatures.
- * 
+ *
+ * Validates JWT tokens WITHOUT using a client secret.
+ * Uses Auth0's public JWKS endpoint to verify token signatures.
+ *
  * Security Features:
  * - Validates token signature using public key cryptography
  * - Verifies issuer (iss claim)
  * - Verifies audience (aud claim)
  * - Verifies expiration (exp claim)
  * - No client secret required
- * 
+ *
  * JWKS Endpoint: https://{AUTH0_DOMAIN}/.well-known/jwks.json
  */
 
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN || process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
 const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE || process.env.NEXT_PUBLIC_AUTH0_AUDIENCE;
 
-if (!AUTH0_DOMAIN) {
-  throw new Error('AUTH0_DOMAIN or NEXT_PUBLIC_AUTH0_DOMAIN environment variable is required');
-}
+// Lazily-created JWKS client — avoids throwing at module load time if env vars
+// are absent during the build phase or in non-API contexts.
+let _jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 
-// Create JWKS client that fetches Auth0's public keys
-const JWKS = createRemoteJWKSet(
-  new URL(`https://${AUTH0_DOMAIN}/.well-known/jwks.json`)
-);
+function getJWKS() {
+  if (!_jwks) {
+    if (!AUTH0_DOMAIN) {
+      throw new Error(
+        'AUTH0_DOMAIN or NEXT_PUBLIC_AUTH0_DOMAIN environment variable is required'
+      );
+    }
+    _jwks = createRemoteJWKSet(
+      new URL(`https://${AUTH0_DOMAIN}/.well-known/jwks.json`)
+    );
+  }
+  return _jwks;
+}
 
 export interface DecodedToken extends JWTPayload {
   sub: string;
@@ -47,12 +56,9 @@ export interface DecodedToken extends JWTPayload {
  */
 export async function validateJWT(token: string): Promise<DecodedToken> {
   try {
-    // Verify token using JWKS public keys
-    const { payload } = await jwtVerify(token, JWKS, {
+    const { payload } = await jwtVerify(token, getJWKS(), {
       issuer: `https://${AUTH0_DOMAIN}/`,
       audience: AUTH0_AUDIENCE,
-      // Automatically checks expiration (exp claim)
-      // Automatically checks not-before (nbf claim)
     });
 
     return payload as DecodedToken;

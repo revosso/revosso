@@ -10,6 +10,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev:https": "next dev --experimental-https",
     "lint": "eslint .",
     "start": "next start",
     "db:generate": "drizzle-kit generate",
@@ -17,7 +18,7 @@
     "db:push": "drizzle-kit push",
     "setup": "./setup-local-dev.sh",
     "dev:landing": "echo 'Opening landing page...' && open http://revosso.local:3000 2>/dev/null || xdg-open http://revosso.local:3000 2>/dev/null || echo 'Visit http://revosso.local:3000'",
-    "dev:dashboard": "echo 'Opening dashboard...' && open http://manage.revosso.local:3000 2>/dev/null || xdg-open http://manage.revosso.local:3000 2>/dev/null || echo 'Visit http://manage.revosso.local:3000'"
+    "dev:dashboard": "echo 'Opening dashboard (HTTPS)...' && open https://localhost:3000/admin 2>/dev/null || xdg-open https://localhost:3000/admin 2>/dev/null || echo 'Visit https://localhost:3000/admin'"
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.17.0",

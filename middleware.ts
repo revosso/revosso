@@ -119,14 +119,24 @@ export default async function middleware(request: NextRequest) {
 
   // CASE 2: Landing subdomain (revosso.com or revosso.local OR localhost)
   if (isLanding) {
-    // Block direct access to dashboard routes from landing domain
-    // Redirect to proper dashboard subdomain
+    // On plain `localhost` (used with `pnpm dev:https`), auth0-spa-js works
+    // because `localhost` is treated as a secure origin by browsers.
+    // Serve dashboard routes directly at `https://localhost:3000/admin`
+    // instead of redirecting to `manage.revosso.local` (which is HTTP-only
+    // and therefore NOT a secure context — breaking the Auth0 SPA SDK).
+    const hostnameBase = hostname.split(':')[0];
+    if (hostnameBase === 'localhost') {
+      return NextResponse.next();
+    }
+
+    // On all other landing domains (revosso.local, revosso.com, www.revosso.com),
+    // block direct dashboard route access and redirect to the proper subdomain.
     if (pathname.startsWith('/admin') || pathname.startsWith('/login')) {
       const dashboardUrl = getDashboardUrl(request, hostname);
       return NextResponse.redirect(`${dashboardUrl}${pathname}`);
     }
-    
-    // All other routes pass through to landing pages
+
+    // All other landing-domain routes pass through.
     return NextResponse.next();
   }
 

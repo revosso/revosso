@@ -2,7 +2,21 @@
 
 import { useEffect } from 'react';
 import { useAuth0 } from '@/components/auth0-provider';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+
+// Build the landing page origin from env or from the current host
+function getLandingOrigin(): string {
+  if (typeof window === 'undefined') return '/';
+  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'revosso.com';
+  const localBase = process.env.NEXT_PUBLIC_LOCAL_BASE_DOMAIN || 'revosso.local';
+  const { hostname, port, protocol } = window.location;
+  const portSuffix = port ? `:${port}` : '';
+
+  if (hostname.includes(localBase)) {
+    return `${protocol}//${localBase}${portSuffix}`;
+  }
+  return `${protocol}//${baseDomain}`;
+}
 
 /**
  * Protected Route Wrapper
@@ -20,38 +34,41 @@ import { useRouter, usePathname } from 'next/navigation';
  * }
  */
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0();
+  const { isLoading, isAuthenticated, error, loginWithRedirect } = useAuth0();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      // Redirect to Auth0 login with return URL
-      loginWithRedirect({
-        appState: {
-          returnTo: pathname,
-        },
-      });
+    // Do not attempt login if there is already an auth initialization error —
+    // that would just cascade the same failure a second time.
+    if (!isLoading && !isAuthenticated && !error) {
+      loginWithRedirect({ appState: { returnTo: pathname } });
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect, pathname]);
+  }, [isLoading, isAuthenticated, error, loginWithRedirect, pathname]);
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
+          <p className="text-slate-400 text-sm">Loading…</p>
         </div>
       </div>
     );
   }
 
-  // Don't render protected content if not authenticated
-  if (!isAuthenticated) {
-    return null;
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="text-center max-w-md px-6">
+          <p className="text-red-400 text-sm font-medium mb-1">Authentication error</p>
+          <p className="text-slate-500 text-xs">{error.message}</p>
+        </div>
+      </div>
+    );
   }
 
-  // User is authenticated, render protected content
+  if (!isAuthenticated) return null;
+
   return <>{children}</>;
 }
 
@@ -71,57 +88,56 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
  * }
  */
 export function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated, user, loginWithRedirect } = useAuth0();
-  const router = useRouter();
+  const { isLoading, isAuthenticated, user, error, loginWithRedirect } = useAuth0();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        // Redirect to Auth0 login
-        loginWithRedirect({
-          appState: {
-            returnTo: pathname,
-          },
-        });
-      } else if (user) {
-        // Check for admin role
-        const roles = (user as any)['https://revosso.com/roles'] || (user as any).roles || [];
-        const isAdmin = roles.includes('admin');
-        
-        if (!isAdmin) {
-          // User is authenticated but not an admin
-          router.push('/?error=unauthorized');
-        }
+    if (isLoading) return;
+
+    // Do not attempt login if there is already an auth initialization error.
+    if (error) return;
+
+    if (!isAuthenticated) {
+      loginWithRedirect({ appState: { returnTo: pathname } });
+    } else if (user) {
+      const roles: string[] =
+        (user as any)['https://revosso.com/roles'] ?? (user as any).roles ?? [];
+      if (!roles.includes('admin')) {
+        // Redirect to the landing page origin to avoid a redirect loop:
+        // on the dashboard domain, '/' → '/admin' via middleware.
+        window.location.href = `${getLandingOrigin()}/?error=unauthorized`;
       }
     }
-  }, [isLoading, isAuthenticated, user, loginWithRedirect, router, pathname]);
+  }, [isLoading, isAuthenticated, user, error, loginWithRedirect, pathname]);
 
-  // Show loading state
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
+          <p className="text-slate-400 text-sm">Loading…</p>
         </div>
       </div>
     );
   }
 
-  // Don't render if not authenticated
-  if (!isAuthenticated || !user) {
-    return null;
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="text-center max-w-md px-6">
+          <p className="text-red-400 text-sm font-medium mb-1">Authentication error</p>
+          <p className="text-slate-500 text-xs">{error.message}</p>
+        </div>
+      </div>
+    );
   }
 
-  // Check admin role
-  const roles = (user as any)['https://revosso.com/roles'] || (user as any).roles || [];
-  const isAdmin = roles.includes('admin');
+  if (!isAuthenticated || !user) return null;
 
-  if (!isAdmin) {
-    return null;
-  }
+  const roles: string[] =
+    (user as any)['https://revosso.com/roles'] ?? (user as any).roles ?? [];
 
-  // User is authenticated and is an admin
+  if (!roles.includes('admin')) return null;
+
   return <>{children}</>;
 }

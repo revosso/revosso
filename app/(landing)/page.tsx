@@ -2,7 +2,6 @@
 
 import type React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,11 +15,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Code,
   ArrowRight,
+  ChevronDown,
   Menu,
   X,
   Send,
@@ -33,680 +32,58 @@ import {
   Database,
 } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-
-// Comprehensive i18n translations for entire landing page
-const translations = {
-  en: {
-    nav: {
-      approach: "Approach",
-      services: "Services",
-      industries: "Solutions",
-      contact: "Contact",
-    },
-    hero: {
-      h1: "Custom Software, Platform Engineering & Scalable Infrastructure",
-      subheadline: "We build custom software platforms, modernize existing systems, and operate scalable infrastructure for organizations that depend on reliable digital systems.",
-      primaryCta: "Discuss Your Project",
-      secondaryCta: "Explore Our Approach",
-    },
-    whoWeAre: {
-      title: "Digital Infrastructure. Built for Scale.",
-      intro: "Revosso is a digital infrastructure and platform engineering company. We build and operate mission-critical systems and long-term digital foundations for enterprises and product-led businesses.",
-      partnerTitle: "We partner with organizations that need:",
-      requirements: [
-        "Robust backend architecture",
-        "High-performance digital platforms",
-        "Secure financial and operational systems",
-        "Long-term technical scalability",
-      ],
-      closing: "We don't deliver short-term solutions.\nWe engineer digital foundations.",
-    },
-    platformLifecycle: {
-      title: "From Architecture to Operation",
-      subtitle: "We build new platforms from scratch, take over and optimize existing systems, and operate and scale your infrastructure.",
-      build: {
-        title: "BUILD",
-        description: "We design and develop custom digital platforms from the ground up, aligned with your business goals and long-term growth.",
-      },
-      takeOver: {
-        title: "TAKE OVER & OPTIMIZE",
-        intro: "We take ownership of existing platforms and systems to:",
-        items: [
-          "Stabilize and refactor codebases",
-          "Enhance performance",
-          "Reduce technical debt",
-          "Modernize architecture",
-          "Strengthen security",
-        ],
-      },
-      operate: {
-        title: "OPERATE & SCALE",
-        intro: "We run and scale your infrastructure and platform operations, including:",
-        items: [
-          "Secure hosting",
-          "Performance monitoring",
-          "Cloud deployment",
-          "Ongoing technical maintenance",
-          "Infrastructure scaling",
-        ],
-      },
-      cta: "Discuss Your Platform Needs",
-    },
-    howWeWork: {
-      title: "Engineering with Long-Term Vision",
-      principles: [
-        { title: "Architecture before code", description: "We design systems to scale seamlessly" },
-        { title: "Scalability from day one", description: "Built to grow with your business" },
-        { title: "Security-first mindset", description: "Protection integrated into the foundation" },
-        { title: "Clean and maintainable", description: "Code that stands the test of time" },
-        { title: "Performance as baseline", description: "Speed and efficiency by design" },
-        { title: "Robust infrastructure", description: "Reliable systems you can depend on" },
-      ],
-    },
-    industries: {
-      title: "Our Engineering Capabilities",
-      subtitle: "From building new systems from scratch to rescuing legacy code — we cover the full spectrum of custom software engineering.",
-      items: [
-        { title: "Custom Software Development", description: "We design and build tailor-made platforms, applications, and digital systems from the ground up — aligned to your exact business requirements and long-term goals." },
-        { title: "System Takeover & Modernization", description: "We take ownership of existing codebases, stabilize them, eliminate technical debt, and modernize architecture to bring aging systems up to current standards." },
-        { title: "Technical Consulting & Architecture", description: "We advise on system design, technology stack selection, and scalability strategy — helping you make the right technical decisions before and during development." },
-        { title: "Long-term Maintenance & Scaling", description: "We provide continuous technical ownership of your systems — performance monitoring, iterative improvements, and scaling your platform as your business grows." },
-      ],
-      cta: "Discuss Your Project",
-    },
-    clients: {
-      title: "Trusted by Businesses & Partners",
-      copy: "We collaborate with companies and platforms to deliver secure, scalable, and high-performance solutions.",
-    },
-    finalCta: {
-      title: "Let's Build the Infrastructure Behind Your Growth",
-      subtitle: "Discuss your project requirements and explore how we can engineer scalable solutions for your business.",
-      trust: "We form long-term partnerships grounded in structured engineering, operational stability, and continuous platform evolution. We prioritize architectural clarity and technical ownership over quick fixes.",
-      button: "Contact Us",
-    },
-    contact: {
-      title: {
-        default: "Contact Us",
-        newPlatform: "New Platform Development",
-        takeover: "Platform Takeover & Optimization",
-        maintenance: "Platform Maintenance",
-        hosting: "Infrastructure & Hosting",
-        partnership: "Partnership Inquiry",
-      },
-      description: "Tell us about your project. We respond within 24 hours.",
-      fields: {
-        name: "Name",
-        email: "Email",
-        company: "Company",
-        need: "What do you need?",
-        message: "Message",
-        needPlaceholder: "Select your need",
-        messagePlaceholder: "Tell us about your project...",
-      },
-      options: {
-        newPlatform: "New Platform Development",
-        takeover: "Platform Takeover & Optimization",
-        maintenance: "Platform Maintenance",
-        hosting: "Infrastructure & Hosting",
-        partnership: "Partnership",
-        general: "General Inquiry",
-      },
-      buttons: {
-        cancel: "Cancel",
-        send: "Send Message",
-        sending: "Sending...",
-      },
-      toast: {
-        selectionRequired: "Selection Required",
-        selectionRequiredDesc: "Please select what you need.",
-        success: "Message Sent Successfully",
-        successDesc: "We'll respond within 24 hours. A confirmation email has been sent to your inbox.",
-        error: "Error",
-        errorDesc: "An error occurred. Please try again.",
-      },
-    },
-    footer: {
-      description: "Digital infrastructure, platform engineering, and scalable systems for enterprise growth.",
-      services: "Services",
-      company: "Company",
-      legal: "Legal",
-      contact: "Contact",
-      links: {
-        customPlatforms: "Custom Platforms",
-        platformEngineering: "Platform Engineering",
-        infrastructure: "Infrastructure",
-        ourApproach: "Our Approach",
-        industries: "Solutions",
-        contact: "Contact",
-        privacy: "Privacy",
-        terms: "Terms",
-        cookies: "Cookies",
-        security: "Security",
-      },
-      copyright: "All rights reserved.",
-    },
-  },
-  fr: {
-    nav: {
-      approach: "Approche",
-      services: "Services",
-      industries: "Solutions",
-      contact: "Contact",
-    },
-    hero: {
-      h1: "Logiciel Sur Mesure, Ingénierie de Plateforme & Infrastructures Évolutives",
-      subheadline: "Nous concevons et construisons des plateformes logicielles sur mesure, modernisons les systèmes existants et exploitons des infrastructures évolutives pour les organisations qui dépendent de systèmes numériques fiables.",
-      primaryCta: "Discuter de Votre Projet",
-      secondaryCta: "Explorer Notre Approche",
-    },
-    whoWeAre: {
-      title: "Infrastructure Numérique. Conçue pour l'Échelle.",
-      intro: "Revosso est une société d'ingénierie d'infrastructure et de plateformes numériques. Nous concevons et exploitons des systèmes critiques et des fondations numériques pérennes pour les entreprises et les acteurs produit.",
-      partnerTitle: "Nous collaborons avec les organisations qui ont besoin de :",
-      requirements: [
-        "Architecture backend robuste",
-        "Plateformes numériques haute performance",
-        "Systèmes financiers et opérationnels sécurisés",
-        "Scalabilité technique à long terme",
-      ],
-      closing: "Nous ne livrons pas de solutions à court terme.\nNous concevons des fondations numériques.",
-    },
-    platformLifecycle: {
-      title: "De l'Architecture à l'Exploitation",
-      subtitle: "Nous construisons de nouvelles plateformes, reprenons et optimisons les systèmes existants, et exploitons et faisons évoluer votre infrastructure.",
-      build: {
-        title: "CONSTRUIRE",
-        description: "Nous concevons et développons des plateformes numériques sur mesure dès l'origine, alignées sur vos objectifs métier et votre croissance à long terme.",
-      },
-      takeOver: {
-        title: "REPRENDRE & OPTIMISER",
-        intro: "Nous prenons en charge les plateformes et systèmes existants pour :",
-        items: [
-          "Stabiliser et refactoriser le code",
-          "Améliorer les performances",
-          "Réduire la dette technique",
-          "Moderniser l'architecture",
-          "Renforcer la sécurité",
-        ],
-      },
-      operate: {
-        title: "EXPLOITER & ÉVOLUER",
-        intro: "Nous exploitons et faisons évoluer votre infrastructure et vos opérations plateforme, notamment :",
-        items: [
-          "Hébergement sécurisé",
-          "Surveillance des performances",
-          "Déploiement cloud",
-          "Maintenance technique continue",
-          "Évolution de l'infrastructure",
-        ],
-      },
-      cta: "Discuter de Vos Besoins de Plateforme",
-    },
-    howWeWork: {
-      title: "Ingénierie avec Vision à Long Terme",
-      principles: [
-        { title: "Architecture avant le code", description: "Concevoir des systèmes évolutifs" },
-        { title: "Scalabilité dès le départ", description: "Construite pour croître avec votre entreprise" },
-        { title: "Sécurité d'abord", description: "Protection intégrée dès les fondations" },
-        { title: "Code propre et maintenable", description: "Résistant à l'épreuve du temps" },
-        { title: "Performance comme référence", description: "Vitesse et efficacité par conception" },
-        { title: "Infrastructure fiable", description: "Systèmes fiables sur lesquels vous pouvez compter" },
-      ],
-    },
-    industries: {
-      title: "Nos Capacités d'Ingénierie",
-      subtitle: "De la construction de nouveaux systèmes à la modernisation de l'existant — nous couvrons tout le spectre de l'ingénierie logicielle sur mesure.",
-      items: [
-        { title: "Développement Logiciel Sur Mesure", description: "Nous concevons et développons des plateformes, applications et systèmes numériques sur mesure dès l'origine — alignés sur vos besoins métier exacts et vos objectifs à long terme." },
-        { title: "Reprise & Modernisation de Systèmes", description: "Nous prenons en charge les codebases existants, les stabilisons, éliminons la dette technique et modernisons l'architecture pour remettre vos systèmes à niveau." },
-        { title: "Conseil Technique & Architecture", description: "Nous conseillons sur la conception de systèmes, le choix des technologies et la stratégie de scalabilité — pour guider vos décisions techniques avant et pendant le développement." },
-        { title: "Maintenance & Évolution Long Terme", description: "Nous assurons la propriété technique continue de vos systèmes — surveillance des performances, améliorations itératives et évolution de votre plateforme avec votre croissance." },
-      ],
-      cta: "Discuter de Votre Projet",
-    },
-    clients: {
-      title: "Reconnu par Entreprises & Partenaires",
-      copy: "Nous collaborons avec des entreprises et plateformes pour offrir des solutions sécurisées, évolutives et performantes.",
-    },
-    finalCta: {
-      title: "Construisons l'Infrastructure Derrière Votre Croissance",
-      subtitle: "Discutez de votre projet et explorez comment nous pouvons concevoir des solutions évolutives pour votre entreprise.",
-      trust: "Nous établissons des partenariats à long terme fondés sur l'ingénierie structurée, la stabilité opérationnelle et l'évolution continue de la plateforme. Nous privilégions la clarté architecturale et la propriété technique plutôt que des solutions rapides.",
-      button: "Nous Contacter",
-    },
-    contact: {
-      title: {
-        default: "Nous Contacter",
-        newPlatform: "Développement de Nouvelle Plateforme",
-        takeover: "Reprise & Optimisation de Plateforme",
-        maintenance: "Maintenance de Plateforme",
-        hosting: "Infrastructure & Hébergement",
-        partnership: "Demande de Partenariat",
-      },
-      description: "Décrivez-nous votre projet. Nous répondons sous 24 heures.",
-      fields: {
-        name: "Nom",
-        email: "Email",
-        company: "Entreprise",
-        need: "De quoi avez-vous besoin ?",
-        message: "Message",
-        needPlaceholder: "Sélectionnez votre besoin",
-        messagePlaceholder: "Décrivez-nous votre projet...",
-      },
-      options: {
-        newPlatform: "Développement de Nouvelle Plateforme",
-        takeover: "Reprise & Optimisation de Plateforme",
-        maintenance: "Maintenance de Plateforme",
-        hosting: "Infrastructure & Hébergement",
-        partnership: "Partenariat",
-        general: "Demande Générale",
-      },
-      buttons: {
-        cancel: "Annuler",
-        send: "Envoyer",
-        sending: "Envoi...",
-      },
-      toast: {
-        selectionRequired: "Sélection requise",
-        selectionRequiredDesc: "Veuillez sélectionner ce dont vous avez besoin.",
-        success: "Message envoyé avec succès",
-        successDesc: "Nous répondrons sous 24 heures. Un email de confirmation a été envoyé.",
-        error: "Erreur",
-        errorDesc: "Une erreur est survenue. Veuillez réessayer.",
-      },
-    },
-    footer: {
-      description: "Infrastructure numérique, ingénierie de plateforme et systèmes évolutifs pour la croissance des entreprises.",
-      services: "Services",
-      company: "Entreprise",
-      legal: "Légal",
-      contact: "Contact",
-      links: {
-        customPlatforms: "Plateformes Sur Mesure",
-        platformEngineering: "Ingénierie de Plateforme",
-        infrastructure: "Infrastructure",
-        ourApproach: "Notre Approche",
-        industries: "Solutions",
-        contact: "Contact",
-        privacy: "Confidentialité",
-        terms: "Conditions",
-        cookies: "Cookies",
-        security: "Sécurité",
-      },
-      copyright: "Tous droits réservés.",
-    },
-  },
-  "pt-BR": {
-    nav: {
-      approach: "Abordagem",
-      services: "Serviços",
-      industries: "Soluções",
-      contact: "Contato",
-    },
-    hero: {
-      h1: "Software Sob Medida, Engenharia de Plataforma e Infraestrutura Escalável",
-      subheadline: "Desenvolvemos plataformas de software sob medida, modernizamos sistemas existentes e operamos infraestrutura escalável para organizações que dependem de sistemas digitais confiáveis.",
-      primaryCta: "Discutir Seu Projeto",
-      secondaryCta: "Explorar Nossa Abordagem",
-    },
-    whoWeAre: {
-      title: "Infraestrutura Digital. Construída para Escala.",
-      intro: "A Revosso é uma empresa de engenharia de infraestrutura e plataformas digitais. Construímos e operamos sistemas de missão crítica e bases digitais de longo prazo para empresas e negócios orientados a produto.",
-      partnerTitle: "Trabalhamos com organizações que precisam de:",
-      requirements: [
-        "Arquitetura backend robusta",
-        "Plataformas digitais de alto desempenho",
-        "Sistemas financeiros e operacionais seguros",
-        "Escalabilidade técnica de longo prazo",
-      ],
-      closing: "Não entregamos soluções de curto prazo.\nProjetamos fundações digitais.",
-    },
-    platformLifecycle: {
-      title: "Da Arquitetura à Operação",
-      subtitle: "Construímos novas plataformas do zero, assumimos e otimizamos sistemas existentes e operamos e escalamos sua infraestrutura.",
-      build: {
-        title: "CONSTRUIR",
-        description: "Projetamos e desenvolvemos plataformas digitais sob medida desde o início, alinhadas aos seus objetivos de negócio e crescimento de longo prazo.",
-      },
-      takeOver: {
-        title: "ASSUMIR & OTIMIZAR",
-        intro: "Assumimos a gestão de plataformas e sistemas existentes para:",
-        items: [
-          "Estabilizar e refatorar código",
-          "Melhorar desempenho",
-          "Reduzir dívida técnica",
-          "Modernizar arquitetura",
-          "Fortalecer segurança",
-        ],
-      },
-      operate: {
-        title: "OPERAR & ESCALAR",
-        intro: "Operamos e escalamos sua infraestrutura e operações de plataforma, incluindo:",
-        items: [
-          "Hospedagem segura",
-          "Monitoramento de desempenho",
-          "Implantação em nuvem",
-          "Manutenção técnica contínua",
-          "Escalabilidade de infraestrutura",
-        ],
-      },
-      cta: "Discutir Suas Necessidades de Plataforma",
-    },
-    howWeWork: {
-      title: "Engenharia com Visão de Longo Prazo",
-      principles: [
-        { title: "Arquitetura antes do código", description: "Projetamos sistemas que escalam facilmente" },
-        { title: "Escalabilidade desde o início", description: "Construído para crescer com seu negócio" },
-        { title: "Segurança em primeiro lugar", description: "Proteção integrada desde a fundação" },
-        { title: "Código limpo e sustentável", description: "Código que resiste ao tempo" },
-        { title: "Performance como referência", description: "Velocidade e eficiência por design" },
-        { title: "Infraestrutura robusta", description: "Sistemas confiáveis nos quais você pode contar" },
-      ],
-    },
-    industries: {
-      title: "Nossas Capacidades de Engenharia",
-      subtitle: "Da construção de novos sistemas à modernização de legados — cobrimos todo o espectro da engenharia de software sob medida.",
-      items: [
-        { title: "Desenvolvimento de Software Sob Medida", description: "Projetamos e construímos plataformas, aplicações e sistemas digitais sob medida desde o início — alinhados às suas necessidades exatas e objetivos de longo prazo." },
-        { title: "Assunção & Modernização de Sistemas", description: "Assumimos a gestão de codebases existentes, os estabilizamos, eliminamos a dívida técnica e modernizamos a arquitetura para trazer sistemas legados ao padrão atual." },
-        { title: "Consultoria Técnica & Arquitetura", description: "Assessoramos sobre design de sistemas, seleção de tecnologias e estratégia de escalabilidade — ajudando você a tomar as decisões técnicas certas antes e durante o desenvolvimento." },
-        { title: "Manutenção & Evolução de Longo Prazo", description: "Fornecemos propriedade técnica contínua dos seus sistemas — monitoramento de desempenho, melhorias iterativas e escalabilidade conforme seu negócio cresce." },
-      ],
-      cta: "Discutir Seu Projeto",
-    },
-    clients: {
-      title: "Confiado por Empresas & Parceiros",
-      copy: "Colaboramos com empresas e plataformas para fornecer soluções seguras, escaláveis e de alto desempenho.",
-    },
-    finalCta: {
-      title: "Vamos Construir a Infraestrutura por Trás do Seu Crescimento",
-      subtitle: "Discuta os requisitos do seu projeto e descubra como podemos criar soluções escaláveis para o seu negócio.",
-      trust: "Formamos parcerias de longo prazo baseadas em engenharia estruturada, estabilidade operacional e evolução contínua da plataforma. Priorizamos clareza arquitetural e propriedade técnica em vez de soluções rápidas.",
-      button: "Entre em Contato",
-    },
-    contact: {
-      title: {
-        default: "Entre em Contato",
-        newPlatform: "Desenvolvimento de Nova Plataforma",
-        takeover: "Assunção & Otimização de Plataforma",
-        maintenance: "Manutenção de Plataforma",
-        hosting: "Infraestrutura & Hospedagem",
-        partnership: "Consulta de Parceria",
-      },
-      description: "Conte-nos sobre seu projeto. Respondemos em até 24 horas.",
-      fields: {
-        name: "Nome",
-        email: "Email",
-        company: "Empresa",
-        need: "O que você precisa?",
-        message: "Mensagem",
-        needPlaceholder: "Selecione sua necessidade",
-        messagePlaceholder: "Conte-nos sobre seu projeto...",
-      },
-      options: {
-        newPlatform: "Desenvolvimento de Nova Plataforma",
-        takeover: "Assunção & Otimização de Plataforma",
-        maintenance: "Manutenção de Plataforma",
-        hosting: "Infraestrutura & Hospedagem",
-        partnership: "Parceria",
-        general: "Consulta Geral",
-      },
-      buttons: {
-        cancel: "Cancelar",
-        send: "Enviar",
-        sending: "Enviando...",
-      },
-      toast: {
-        selectionRequired: "Seleção necessária",
-        selectionRequiredDesc: "Por favor, selecione sua necessidade.",
-        success: "Mensagem enviada com sucesso",
-        successDesc: "Responderemos em até 24 horas. Um email de confirmação foi enviado.",
-        error: "Erro",
-        errorDesc: "Ocorreu um erro. Tente novamente.",
-      },
-    },
-    footer: {
-      description: "Infraestrutura digital, engenharia de plataforma e sistemas escaláveis para o crescimento empresarial.",
-      services: "Serviços",
-      company: "Empresa",
-      legal: "Legal",
-      contact: "Contato",
-      links: {
-        customPlatforms: "Plataformas Personalizadas",
-        platformEngineering: "Engenharia de Plataforma",
-        infrastructure: "Infraestrutura",
-        ourApproach: "Nossa Abordagem",
-        industries: "Soluções",
-        contact: "Contato",
-        privacy: "Privacidade",
-        terms: "Termos",
-        cookies: "Cookies",
-        security: "Segurança",
-      },
-      copyright: "Todos os direitos reservados.",
-    },
-  },
-  es: {
-    nav: {
-      approach: "Enfoque",
-      services: "Servicios",
-      industries: "Soluciones",
-      contact: "Contacto",
-    },
-    hero: {
-      h1: "Software a Medida, Ingeniería de Plataforma e Infraestructura Escalable",
-      subheadline: "Desarrollamos plataformas de software a medida, modernizamos sistemas existentes y operamos infraestructura escalable para organizaciones que dependen de sistemas digitales confiables.",
-      primaryCta: "Discutir Su Proyecto",
-      secondaryCta: "Explorar Nuestro Enfoque",
-    },
-    whoWeAre: {
-      title: "Infraestructura Digital. Construida para Escala.",
-      intro: "Revosso es una empresa de ingeniería de infraestructura y plataformas digitales. Construimos y operamos sistemas de misión crítica y bases digitales de largo plazo para empresas y negocios orientados a producto.",
-      partnerTitle: "Trabajamos con organizaciones que necesitan:",
-      requirements: [
-        "Arquitectura backend robusta",
-        "Plataformas digitales de alto rendimiento",
-        "Sistemas financieros y operativos seguros",
-        "Escalabilidad técnica a largo plazo",
-      ],
-      closing: "No entregamos soluciones a corto plazo.\nIngeniamos bases digitales.",
-    },
-    platformLifecycle: {
-      title: "De la Arquitectura a la Operación",
-      subtitle: "Construimos nuevas plataformas desde cero, asumimos y optimizamos sistemas existentes, y operamos y escalamos su infraestructura.",
-      build: {
-        title: "CONSTRUIR",
-        description: "Diseñamos y desarrollamos plataformas digitales a medida desde el inicio, alineadas con sus objetivos de negocio y crecimiento a largo plazo.",
-      },
-      takeOver: {
-        title: "ASUMIR & OPTIMIZAR",
-        intro: "Asumimos la gestión de plataformas y sistemas existentes para:",
-        items: [
-          "Estabilizar y refactorizar el código",
-          "Mejorar el rendimiento",
-          "Reducir la deuda técnica",
-          "Modernizar la arquitectura",
-          "Fortalecer la seguridad",
-        ],
-      },
-      operate: {
-        title: "OPERAR & ESCALAR",
-        intro: "Operamos y escalamos su infraestructura y operaciones de plataforma, incluyendo:",
-        items: [
-          "Alojamiento seguro",
-          "Monitoreo de rendimiento",
-          "Despliegue en la nube",
-          "Mantenimiento técnico continuo",
-          "Escalabilidad de infraestructura",
-        ],
-      },
-      cta: "Discutir Sus Necesidades de Plataforma",
-    },
-    howWeWork: {
-      title: "Ingeniería con Visión a Largo Plazo",
-      principles: [
-        { title: "Arquitectura antes del código", description: "Diseñamos sistemas que escalan sin problemas" },
-        { title: "Escalabilidad desde el primer día", description: "Construido para crecer con su negocio" },
-        { title: "Seguridad primero", description: "Protección integrada desde la base" },
-        { title: "Código limpio y mantenible", description: "Código que resiste el paso del tiempo" },
-        { title: "Rendimiento como estándar", description: "Velocidad y eficiencia por diseño" },
-        { title: "Infraestructura confiable", description: "Sistemas fiables en los que puede confiar" },
-      ],
-    },
-    industries: {
-      title: "Nuestras Capacidades de Ingeniería",
-      subtitle: "Desde la construcción de nuevos sistemas hasta la modernización de legados — cubrimos todo el espectro de la ingeniería de software a medida.",
-      items: [
-        { title: "Desarrollo de Software a Medida", description: "Diseñamos y desarrollamos plataformas, aplicaciones y sistemas digitales a medida desde el inicio — alineados con sus necesidades exactas y objetivos a largo plazo." },
-        { title: "Asunción & Modernización de Sistemas", description: "Tomamos la gestión de codebases existentes, los estabilizamos, eliminamos la deuda técnica y modernizamos la arquitectura para actualizar sistemas legados." },
-        { title: "Consultoría Técnica & Arquitectura", description: "Asesoramos sobre diseño de sistemas, selección de tecnologías y estrategia de escalabilidad — ayudándole a tomar las decisiones técnicas correctas antes y durante el desarrollo." },
-        { title: "Mantenimiento & Evolución a Largo Plazo", description: "Proporcionamos propiedad técnica continua de sus sistemas — monitoreo de rendimiento, mejoras iterativas y escalabilidad de su plataforma a medida que crece su negocio." },
-      ],
-      cta: "Discutir Su Proyecto",
-    },
-    clients: {
-      title: "Confiado por Empresas y Socios",
-      copy: "Colaboramos con empresas y plataformas para ofrecer soluciones seguras, escalables y de alto rendimiento.",
-    },
-    finalCta: {
-      title: "Construyamos la Infraestructura Detrás de Su Crecimiento",
-      subtitle: "Comparta los requisitos de su proyecto y descubra cómo podemos diseñar soluciones escalables para su negocio.",
-      trust: "Formamos asociaciones a largo plazo basadas en ingeniería estructurada, estabilidad operacional y evolución continua de la plataforma. Priorizamos claridad arquitectónica y propiedad técnica sobre soluciones rápidas.",
-      button: "Contáctenos",
-    },
-    contact: {
-      title: {
-        default: "Contáctenos",
-        newPlatform: "Desarrollo de Nueva Plataforma",
-        takeover: "Asunción y Optimización de Plataforma",
-        maintenance: "Mantenimiento de Plataforma",
-        hosting: "Infraestructura y Alojamiento",
-        partnership: "Consulta de Asociación",
-      },
-      description: "Cuéntenos sobre su proyecto. Respondemos en 24 horas.",
-      fields: {
-        name: "Nombre",
-        email: "Correo electrónico",
-        company: "Empresa",
-        need: "¿Qué necesita?",
-        message: "Mensaje",
-        needPlaceholder: "Seleccione su necesidad",
-        messagePlaceholder: "Cuéntenos sobre su proyecto...",
-      },
-      options: {
-        newPlatform: "Desarrollo de Nueva Plataforma",
-        takeover: "Asunción y Optimización de Plataforma",
-        maintenance: "Mantenimiento de Plataforma",
-        hosting: "Infraestructura y Alojamiento",
-        partnership: "Asociación",
-        general: "Consulta General",
-      },
-      buttons: {
-        cancel: "Cancelar",
-        send: "Enviar",
-        sending: "Enviando...",
-      },
-      toast: {
-        selectionRequired: "Selección requerida",
-        selectionRequiredDesc: "Por favor seleccione lo que necesita.",
-        success: "Mensaje enviado con éxito",
-        successDesc: "Responderemos en 24 horas. Se ha enviado un correo de confirmación.",
-        error: "Error",
-        errorDesc: "Ocurrió un error. Intente nuevamente.",
-      },
-    },
-    footer: {
-      description: "Infraestructura digital, ingeniería de plataforma y sistemas escalables para el crecimiento empresarial.",
-      services: "Servicios",
-      company: "Empresa",
-      legal: "Legal",
-      contact: "Contacto",
-      links: {
-        customPlatforms: "Plataformas a Medida",
-        platformEngineering: "Ingeniería de Plataforma",
-        infrastructure: "Infraestructura",
-        ourApproach: "Nuestro Enfoque",
-        industries: "Soluciones",
-        contact: "Contacto",
-        privacy: "Privacidad",
-        terms: "Términos",
-        cookies: "Cookies",
-        security: "Seguridad",
-      },
-      copyright: "Todos los derechos reservados.",
-    },
-  },
-};
-
-
-// Client/Partner data
-const clients = [
-  { name: "Cashlakay", url: "https://cashlakay.com", description: "Custom platform development" },
-  { name: "Revofin", url: "https://finance.revosso.com", description: "Financial platform hosting" },
-  { name: "Rechajem", url: "https://rechajem.revosso.com", description: "Platform development" },
-  { name: "Nuvann", url: "https://nuvann.com", description: "Platform hosting" },
-]
+import { translations, clients } from "@/lib/landing-data"
 
 export default function LandingPage() {
-  const [mounted, setMounted] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedInterest, setSelectedInterest] = useState<string>("")
   const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Detect browser locale on mount
-  useEffect(() => {
     const browserLocale = navigator.language || "en"
-    if (browserLocale.startsWith("fr")) {
-      setLocale("fr")
-    } else if (browserLocale.startsWith("pt")) {
-      setLocale("pt-BR")
-    } else if (browserLocale.startsWith("es")) {
-      setLocale("es")
-    } else {
-      setLocale("en")
-    }
+    if (browserLocale.startsWith("fr")) setLocale("fr")
+    else if (browserLocale.startsWith("pt")) setLocale("pt-BR")
+    else if (browserLocale.startsWith("es")) setLocale("es")
+    else setLocale("en")
   }, [])
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", handleScroll)
+    const handleScroll = () => setIsScrolled(window.scrollY > 50)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const form = e.currentTarget
     setIsSubmitting(true)
 
     if (!selectedInterest) {
       toast({
-        title: translations[locale].contact.toast.selectionRequired,
-        description: translations[locale].contact.toast.selectionRequiredDesc,
+        title: t.contact.toast.selectionRequired,
+        description: t.contact.toast.selectionRequiredDesc,
         variant: "destructive",
       })
       setIsSubmitting(false)
       return
     }
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(form)
     const contactData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       company: formData.get("company") as string | undefined,
       message: formData.get("message") as string,
-      productInterest: selectedInterest as "NEW_PLATFORM" | "PLATFORM_TAKEOVER" | "PLATFORM_MAINTENANCE" | "INFRASTRUCTURE_HOSTING" | "PARTNERSHIP" | "GENERAL_INQUIRY",
+      productInterest: selectedInterest as
+        | "NEW_PLATFORM"
+        | "PLATFORM_TAKEOVER"
+        | "PLATFORM_MAINTENANCE"
+        | "INFRASTRUCTURE_HOSTING"
+        | "PARTNERSHIP"
+        | "GENERAL_INQUIRY",
       source: "homepage",
       honeypot: "",
     }
@@ -714,52 +91,192 @@ export default function LandingPage() {
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactData),
       })
 
       const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error sending message")
-      }
+      if (!response.ok) throw new Error(data.error || "Error sending message")
 
       setIsSubmitting(false)
       setIsContactOpen(false)
       setSelectedInterest("")
-      e.currentTarget.reset()
+      form.reset()
 
       toast({
-        title: translations[locale].contact.toast.success,
-        description: translations[locale].contact.toast.successDesc,
+        title: t.contact.toast.success,
+        description: t.contact.toast.successDesc,
       })
     } catch (error) {
       setIsSubmitting(false)
       toast({
-        title: translations[locale].contact.toast.error,
-        description: error instanceof Error ? error.message : translations[locale].contact.toast.errorDesc,
+        title: t.contact.toast.error,
+        description: error instanceof Error ? error.message : t.contact.toast.errorDesc,
         variant: "destructive",
       })
     }
   }
 
-  if (!mounted) return null
+  const t = translations[locale]
+  const year = new Date().getFullYear()
+
+  const contactTitle =
+    selectedInterest === "NEW_PLATFORM"
+      ? t.contact.title.newPlatform
+      : selectedInterest === "PLATFORM_TAKEOVER"
+      ? t.contact.title.takeover
+      : selectedInterest === "PLATFORM_MAINTENANCE"
+      ? t.contact.title.maintenance
+      : selectedInterest === "INFRASTRUCTURE_HOSTING"
+      ? t.contact.title.hosting
+      : selectedInterest === "PARTNERSHIP"
+      ? t.contact.title.partnership
+      : t.contact.title.default
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" suppressHydrationWarning>
+      {/* Single contact dialog — all CTAs open this via setIsContactOpen(true) */}
+      <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white">{contactTitle}</DialogTitle>
+            <DialogDescription className="text-base text-slate-300">
+              {t.contact.description}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleContactSubmit} className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-slate-200 font-medium">
+                  {t.contact.fields.name} *
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="John Doe"
+                  required
+                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-slate-200 font-medium">
+                  {t.contact.fields.email} *
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="john@company.com"
+                  required
+                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company" className="text-slate-200 font-medium">
+                {t.contact.fields.company}
+              </Label>
+              <Input
+                id="company"
+                name="company"
+                placeholder="Your Company"
+                className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="productInterest" className="text-slate-200 font-medium">
+                {t.contact.fields.need} *
+              </Label>
+              <Select name="productInterest" value={selectedInterest} onValueChange={setSelectedInterest}>
+                <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
+                  <SelectValue placeholder={t.contact.fields.needPlaceholder} className="text-slate-400" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  <SelectItem value="NEW_PLATFORM" className="text-white hover:bg-slate-700">
+                    {t.contact.options.newPlatform}
+                  </SelectItem>
+                  <SelectItem value="PLATFORM_TAKEOVER" className="text-white hover:bg-slate-700">
+                    {t.contact.options.takeover}
+                  </SelectItem>
+                  <SelectItem value="PLATFORM_MAINTENANCE" className="text-white hover:bg-slate-700">
+                    {t.contact.options.maintenance}
+                  </SelectItem>
+                  <SelectItem value="INFRASTRUCTURE_HOSTING" className="text-white hover:bg-slate-700">
+                    {t.contact.options.hosting}
+                  </SelectItem>
+                  <SelectItem value="PARTNERSHIP" className="text-white hover:bg-slate-700">
+                    {t.contact.options.partnership}
+                  </SelectItem>
+                  <SelectItem value="GENERAL_INQUIRY" className="text-white hover:bg-slate-700">
+                    {t.contact.options.general}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-slate-200 font-medium">
+                {t.contact.fields.message} *
+              </Label>
+              <Textarea
+                id="message"
+                name="message"
+                placeholder={t.contact.fields.messagePlaceholder}
+                required
+                className="min-h-[120px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
+              />
+            </div>
+
+            <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsContactOpen(false)}
+                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+                disabled={isSubmitting}
+              >
+                {t.contact.buttons.cancel}
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                disabled={isSubmitting || !selectedInterest}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    {t.contact.buttons.sending}
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    {t.contact.buttons.send}
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          scrollY > 50 ? "bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg" : "bg-transparent"
+          isScrolled
+            ? "bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg"
+            : "bg-transparent"
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 lg:h-20 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" suppressHydrationWarning></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" />
                 <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg">
                   <Code className="h-6 w-6" />
                 </div>
@@ -771,10 +288,10 @@ export default function LandingPage() {
 
             <nav className="hidden lg:flex items-center space-x-8">
               {[
-                { name: translations[locale].nav.approach, href: "#approach" },
-                { name: translations[locale].nav.services, href: "#services" },
-                { name: translations[locale].nav.industries, href: "#solutions" },
-                { name: translations[locale].nav.contact, href: "#contact" },
+                { name: t.nav.approach, href: "#approach" },
+                { name: t.nav.services, href: "#services" },
+                { name: t.nav.industries, href: "#solutions" },
+                { name: t.nav.contact, href: "#contact" },
               ].map((item) => (
                 <Link
                   key={item.href}
@@ -782,24 +299,29 @@ export default function LandingPage() {
                   className="text-slate-300 hover:text-blue-400 font-medium transition-colors duration-200 relative group"
                 >
                   {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300" />
                 </Link>
               ))}
             </nav>
 
             <div className="hidden lg:flex items-center space-x-4">
-              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                    {translations[locale].hero.primaryCta}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
+              <Button
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => setIsContactOpen(true)}
+              >
+                {t.hero.primaryCta}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
 
             <div className="lg:hidden flex items-center space-x-2">
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-slate-300">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-slate-300"
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             </div>
@@ -809,10 +331,10 @@ export default function LandingPage() {
             <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl">
               <nav className="container mx-auto px-4 py-6 space-y-4">
                 {[
-                  { name: translations[locale].nav.approach, href: "#approach" },
-                  { name: translations[locale].nav.services, href: "#services" },
-                  { name: translations[locale].nav.industries, href: "#solutions" },
-                  { name: translations[locale].nav.contact, href: "#contact" },
+                  { name: t.nav.approach, href: "#approach" },
+                  { name: t.nav.services, href: "#services" },
+                  { name: t.nav.industries, href: "#solutions" },
+                  { name: t.nav.contact, href: "#contact" },
                 ].map((item) => (
                   <Link
                     key={item.href}
@@ -824,14 +346,16 @@ export default function LandingPage() {
                   </Link>
                 ))}
                 <div className="pt-4">
-                  <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                        {translations[locale].hero.primaryCta}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
+                  <Button
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    onClick={() => {
+                      setIsMenuOpen(false)
+                      setIsContactOpen(true)
+                    }}
+                  >
+                    {t.hero.primaryCta}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </div>
               </nav>
             </div>
@@ -842,47 +366,42 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative overflow-x-hidden py-20 lg:py-32">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl"></div>
+            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl" />
           </div>
 
           <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
             <div className="text-center space-y-8 py-16 lg:py-24">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-                  {translations[locale].hero.h1}
+                  {t.hero.h1}
                 </span>
               </h1>
 
               <p className="text-xl sm:text-2xl lg:text-3xl text-slate-300 leading-relaxed max-w-3xl mx-auto">
-                {translations[locale].hero.subheadline}
+                {t.hero.subheadline}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="lg"
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                    >
-                      {translations[locale].hero.primaryCta}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                  onClick={() => setIsContactOpen(true)}
+                >
+                  {t.hero.primaryCta}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
 
                 <Button
                   size="lg"
                   variant="outline"
                   className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-                  onClick={() => {
-                    document.getElementById("approach")?.scrollIntoView({ behavior: "smooth" })
-                  }}
+                  onClick={() => document.getElementById("approach")?.scrollIntoView({ behavior: "smooth" })}
                 >
-                  {translations[locale].hero.secondaryCta}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  {t.hero.secondaryCta}
+                  <ChevronDown className="ml-2 h-5 w-5" />
                 </Button>
               </div>
             </div>
@@ -895,19 +414,17 @@ export default function LandingPage() {
             <div className="space-y-12">
               <div className="text-center space-y-4">
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                  {translations[locale].whoWeAre.title}
+                  {t.whoWeAre.title}
                 </h2>
               </div>
 
               <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
-                <p>
-                  {translations[locale].whoWeAre.intro}
-                </p>
+                <p>{t.whoWeAre.intro}</p>
 
-                <p className="font-medium text-white">{translations[locale].whoWeAre.partnerTitle}</p>
+                <p className="font-medium text-white">{t.whoWeAre.partnerTitle}</p>
 
                 <ul className="space-y-3 list-none">
-                  {translations[locale].whoWeAre.requirements.map((req, index) => (
+                  {t.whoWeAre.requirements.map((req, index) => (
                     <li key={index} className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-blue-400 mr-3 mt-1 flex-shrink-0" />
                       <span>{req}</span>
@@ -915,9 +432,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                <p className="pt-4 font-medium text-white whitespace-pre-line">
-                  {translations[locale].whoWeAre.closing}
-                </p>
+                <p className="pt-4 font-medium text-white whitespace-pre-line">{t.whoWeAre.closing}</p>
               </div>
             </div>
           </div>
@@ -928,51 +443,42 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {translations[locale].platformLifecycle.title}
+                {t.platformLifecycle.title}
               </h2>
-              <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                {translations[locale].platformLifecycle.subtitle}
-              </p>
+              <p className="text-xl text-slate-300 max-w-3xl mx-auto">{t.platformLifecycle.subtitle}</p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-              {/* Block 1 - BUILD */}
               <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
                 <CardContent className="p-8 lg:p-10 space-y-6">
                   <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
                     <Layers className="h-8 w-8 text-white" />
                   </div>
-
                   <div className="space-y-4">
                     <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {translations[locale].platformLifecycle.build.title}
+                      {t.platformLifecycle.build.title}
                     </h3>
-
                     <p className="text-slate-300 leading-relaxed text-lg">
-                      {translations[locale].platformLifecycle.build.description}
+                      {t.platformLifecycle.build.description}
                     </p>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Block 2 - TAKE OVER & OPTIMIZE */}
               <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
                 <CardContent className="p-8 lg:p-10 space-y-6">
                   <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
                     <TrendingUp className="h-8 w-8 text-white" />
                   </div>
-
                   <div className="space-y-4">
                     <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {translations[locale].platformLifecycle.takeOver.title}
+                      {t.platformLifecycle.takeOver.title}
                     </h3>
-
                     <p className="text-slate-300 leading-relaxed text-lg mb-4">
-                      {translations[locale].platformLifecycle.takeOver.intro}
+                      {t.platformLifecycle.takeOver.intro}
                     </p>
-
                     <ul className="space-y-2 text-slate-300">
-                      {translations[locale].platformLifecycle.takeOver.items.map((item, index) => (
+                      {t.platformLifecycle.takeOver.items.map((item, index) => (
                         <li key={index} className="flex items-start">
                           <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
                           <span>{item}</span>
@@ -983,24 +489,20 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              {/* Block 3 - OPERATE & SCALE */}
               <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
                 <CardContent className="p-8 lg:p-10 space-y-6">
                   <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
                     <Server className="h-8 w-8 text-white" />
                   </div>
-
                   <div className="space-y-4">
                     <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {translations[locale].platformLifecycle.operate.title}
+                      {t.platformLifecycle.operate.title}
                     </h3>
-
                     <p className="text-slate-300 leading-relaxed text-lg mb-4">
-                      {translations[locale].platformLifecycle.operate.intro}
+                      {t.platformLifecycle.operate.intro}
                     </p>
-
                     <ul className="space-y-2 text-slate-300">
-                      {translations[locale].platformLifecycle.operate.items.map((item, index) => (
+                      {t.platformLifecycle.operate.items.map((item, index) => (
                         <li key={index} className="flex items-start">
                           <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
                           <span>{item}</span>
@@ -1013,17 +515,14 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-12">
-              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                  >
-                    {translations[locale].platformLifecycle.cta}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                onClick={() => setIsContactOpen(true)}
+              >
+                {t.platformLifecycle.cta}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </div>
           </div>
         </section>
@@ -1033,18 +532,18 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {translations[locale].howWeWork.title}
+                {t.howWeWork.title}
               </h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { icon: Layers, ...translations[locale].howWeWork.principles[0] },
-                { icon: TrendingUp, ...translations[locale].howWeWork.principles[1] },
-                { icon: Shield, ...translations[locale].howWeWork.principles[2] },
-                { icon: Code, ...translations[locale].howWeWork.principles[3] },
-                { icon: Zap, ...translations[locale].howWeWork.principles[4] },
-                { icon: Database, ...translations[locale].howWeWork.principles[5] },
+                { icon: Layers, ...t.howWeWork.principles[0] },
+                { icon: TrendingUp, ...t.howWeWork.principles[1] },
+                { icon: Shield, ...t.howWeWork.principles[2] },
+                { icon: Code, ...t.howWeWork.principles[3] },
+                { icon: Zap, ...t.howWeWork.principles[4] },
+                { icon: Database, ...t.howWeWork.principles[5] },
               ].map((principle, index) => (
                 <Card key={index} className="border-0 bg-slate-800/50 shadow-lg">
                   <CardContent className="p-6 space-y-4">
@@ -1057,6 +556,18 @@ export default function LandingPage() {
                 </Card>
               ))}
             </div>
+
+            <div className="text-center mt-12">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
+                onClick={() => setIsContactOpen(true)}
+              >
+                {t.hero.primaryCta}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -1065,19 +576,19 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {translations[locale].industries.title}
+                {t.industries.title}
               </h2>
               <p className="text-lg text-slate-400 max-w-2xl mx-auto mt-4 leading-relaxed">
-                {translations[locale].industries.subtitle}
+                {t.industries.subtitle}
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
               {[
-                { icon: Code, ...translations[locale].industries.items[0] },
-                { icon: TrendingUp, ...translations[locale].industries.items[1] },
-                { icon: Layers, ...translations[locale].industries.items[2] },
-                { icon: Server, ...translations[locale].industries.items[3] },
+                { icon: Code, ...t.industries.items[0] },
+                { icon: TrendingUp, ...t.industries.items[1] },
+                { icon: Layers, ...t.industries.items[2] },
+                { icon: Server, ...t.industries.items[3] },
               ].map((capability, index) => (
                 <Card key={index} className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
                   <CardContent className="p-8 space-y-4">
@@ -1092,18 +603,15 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-12">
-              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-                  >
-                    {translations[locale].industries.cta}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
+                onClick={() => setIsContactOpen(true)}
+              >
+                {t.industries.cta}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </div>
           </div>
         </section>
@@ -1113,213 +621,64 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {translations[locale].clients.title}
+                {t.clients.title}
               </h2>
-              <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                {translations[locale].clients.copy}
-              </p>
+              <p className="text-xl text-slate-300 max-w-3xl mx-auto">{t.clients.copy}</p>
             </div>
 
-            <TooltipProvider>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
-                {clients.map((client, index) => (
-                  <Tooltip key={index}>
-                    <TooltipTrigger asChild>
-                      <a
-                        href={client.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex flex-col items-center justify-center p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
-                      >
-                        <div className="w-full h-20 flex items-center justify-center">
-                          <div className="text-2xl lg:text-3xl font-bold text-slate-300 group-hover:text-white transition-colors duration-300">
-                            {client.name}
-                          </div>
-                        </div>
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-slate-800 border-slate-700 text-white">
-                      <p className="font-medium">{client.name}</p>
-                      <p className="text-sm text-slate-300 mt-1">{client.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </div>
-            </TooltipProvider>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+              {clients.map((client, index) => (
+                <a
+                  key={index}
+                  href={client.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center justify-center p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
+                >
+                  <div className="text-2xl lg:text-3xl font-bold text-slate-300 group-hover:text-white transition-colors duration-300 text-center">
+                    {client.name}
+                  </div>
+                  <p className="text-sm text-slate-500 group-hover:text-slate-400 mt-3 text-center transition-colors duration-300">
+                    {client.description}
+                  </p>
+                </a>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* Final CTA Section */}
-        <section id="contact" className="py-20 lg:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden">
+        <section
+          id="contact"
+          className="py-20 lg:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden"
+        >
           <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+            <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
           </div>
 
           <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
             <div className="space-y-8">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white">
-                {translations[locale].finalCta.title}
+                {t.finalCta.title}
               </h2>
 
               <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-2xl mx-auto">
-                {translations[locale].finalCta.subtitle}
+                {t.finalCta.subtitle}
               </p>
 
               <div className="max-w-2xl mx-auto space-y-4 pt-4">
-                <p className="text-lg text-blue-100 leading-relaxed">
-                  {translations[locale].finalCta.trust}
-                </p>
+                <p className="text-lg text-blue-100 leading-relaxed">{t.finalCta.trust}</p>
               </div>
 
-              <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="lg"
-                    className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                  >
-                    {translations[locale].finalCta.button}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-white">
-                      {selectedInterest === "NEW_PLATFORM"
-                        ? translations[locale].contact.title.newPlatform
-                        : selectedInterest === "PLATFORM_TAKEOVER"
-                        ? translations[locale].contact.title.takeover
-                        : selectedInterest === "PLATFORM_MAINTENANCE"
-                        ? translations[locale].contact.title.maintenance
-                        : selectedInterest === "INFRASTRUCTURE_HOSTING"
-                        ? translations[locale].contact.title.hosting
-                        : selectedInterest === "PARTNERSHIP"
-                        ? translations[locale].contact.title.partnership
-                        : translations[locale].contact.title.default}
-                    </DialogTitle>
-                    <DialogDescription className="text-base text-slate-300">
-                      {translations[locale].contact.description}
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <form onSubmit={handleContactSubmit} className="space-y-6 mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-slate-200 font-medium">
-                          {translations[locale].contact.fields.name} *
-                        </Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          placeholder="John Doe"
-                          required
-                          className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-slate-200 font-medium">
-                          {translations[locale].contact.fields.email} *
-                        </Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          placeholder="john@company.com"
-                          required
-                          className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="company" className="text-slate-200 font-medium">
-                        {translations[locale].contact.fields.company}
-                      </Label>
-                      <Input
-                        id="company"
-                        name="company"
-                        placeholder="Your Company"
-                        className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="productInterest" className="text-slate-200 font-medium">
-                        {translations[locale].contact.fields.need} *
-                      </Label>
-                      <Select name="productInterest" value={selectedInterest} onValueChange={setSelectedInterest}>
-                        <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                          <SelectValue placeholder={translations[locale].contact.fields.needPlaceholder} className="text-slate-400" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-slate-600">
-                          <SelectItem value="NEW_PLATFORM" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.newPlatform}
-                          </SelectItem>
-                          <SelectItem value="PLATFORM_TAKEOVER" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.takeover}
-                          </SelectItem>
-                          <SelectItem value="PLATFORM_MAINTENANCE" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.maintenance}
-                          </SelectItem>
-                          <SelectItem value="INFRASTRUCTURE_HOSTING" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.hosting}
-                          </SelectItem>
-                          <SelectItem value="PARTNERSHIP" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.partnership}
-                          </SelectItem>
-                          <SelectItem value="GENERAL_INQUIRY" className="text-white hover:bg-slate-700">
-                            {translations[locale].contact.options.general}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message" className="text-slate-200 font-medium">
-                        {translations[locale].contact.fields.message} *
-                      </Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        placeholder={translations[locale].contact.fields.messagePlaceholder}
-                        required
-                        className="min-h-[120px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                      />
-                    </div>
-
-                    <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
-
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsContactOpen(false)}
-                        className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
-                        disabled={isSubmitting}
-                      >
-                        {translations[locale].contact.buttons.cancel}
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-                        disabled={isSubmitting || !selectedInterest}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            {translations[locale].contact.buttons.sending}
-                          </>
-                        ) : (
-                          <>
-                            <Send className="mr-2 h-4 w-4" />
-                            {translations[locale].contact.buttons.send}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              <Button
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                onClick={() => setIsContactOpen(true)}
+              >
+                {t.finalCta.button}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </div>
           </div>
         </section>
@@ -1338,9 +697,7 @@ export default function LandingPage() {
                   REVOSSO
                 </span>
               </Link>
-              <p className="text-slate-400 leading-relaxed">
-                {translations[locale].footer.description}
-              </p>
+              <p className="text-slate-400 leading-relaxed">{t.footer.description}</p>
               <p className="text-slate-400 text-sm">
                 <a href="mailto:contact@revosso.com" className="hover:text-white transition-colors">
                   contact@revosso.com
@@ -1349,92 +706,93 @@ export default function LandingPage() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{translations[locale].footer.services}</h3>
+              <h3 className="text-lg font-semibold">{t.footer.services}</h3>
               <ul className="space-y-2 text-slate-400">
                 <li>
                   <Link href="#services" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.customPlatforms}
+                    {t.footer.links.customPlatforms}
                   </Link>
                 </li>
                 <li>
                   <Link href="#services" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.platformEngineering}
+                    {t.footer.links.platformEngineering}
                   </Link>
                 </li>
                 <li>
                   <Link href="#services" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.infrastructure}
+                    {t.footer.links.infrastructure}
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{translations[locale].footer.company}</h3>
+              <h3 className="text-lg font-semibold">{t.footer.company}</h3>
               <ul className="space-y-2 text-slate-400">
                 <li>
                   <Link href="#approach" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.ourApproach}
+                    {t.footer.links.ourApproach}
                   </Link>
                 </li>
                 <li>
                   <Link href="#solutions" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.industries}
+                    {t.footer.links.industries}
                   </Link>
                 </li>
                 <li>
                   <Link href="#contact" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.contact}
+                    {t.footer.links.contact}
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{translations[locale].footer.legal}</h3>
+              <h3 className="text-lg font-semibold">{t.footer.legal}</h3>
               <ul className="space-y-2 text-slate-400">
                 <li>
                   <Link href="/privacy" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.privacy}
+                    {t.footer.links.privacy}
                   </Link>
                 </li>
                 <li>
                   <Link href="/terms" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.terms}
+                    {t.footer.links.terms}
                   </Link>
                 </li>
                 <li>
                   <Link href="/cookies" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.cookies}
+                    {t.footer.links.cookies}
                   </Link>
                 </li>
                 <li>
                   <Link href="/security" className="hover:text-white transition-colors">
-                    {translations[locale].footer.links.security}
+                    {t.footer.links.security}
                   </Link>
                 </li>
               </ul>
             </div>
-
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Revosso. {translations[locale].footer.copyright}</p>
+            <p className="text-slate-400 text-sm">
+              © {year} Revosso. {t.footer.copyright}
+            </p>
             <div className="flex gap-4 text-slate-400 text-sm">
               <Link href="/privacy" className="hover:text-white transition-colors">
-                {translations[locale].footer.links.privacy}
+                {t.footer.links.privacy}
               </Link>
               <span>·</span>
               <Link href="/terms" className="hover:text-white transition-colors">
-                {translations[locale].footer.links.terms}
+                {t.footer.links.terms}
               </Link>
               <span>·</span>
               <Link href="/security" className="hover:text-white transition-colors">
-                {translations[locale].footer.links.security}
+                {t.footer.links.security}
               </Link>
               <span>·</span>
               <Link href="/cookies" className="hover:text-white transition-colors">
-                {translations[locale].footer.links.cookies}
+                {t.footer.links.cookies}
               </Link>
             </div>
           </div>
