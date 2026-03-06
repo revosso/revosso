@@ -30,7 +30,14 @@ import {
   TrendingUp,
   Server,
   Database,
+  Globe,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { toast } from "@/hooks/use-toast"
 import { translations, clients } from "@/lib/landing-data"
 
@@ -43,12 +50,29 @@ export default function LandingPage() {
   const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
 
   useEffect(() => {
+    const saved = localStorage.getItem("revosso-locale") as "en" | "fr" | "pt-BR" | "es" | null
+    if (saved && ["en", "fr", "pt-BR", "es"].includes(saved)) {
+      setLocale(saved)
+      return
+    }
     const browserLocale = navigator.language || "en"
     if (browserLocale.startsWith("fr")) setLocale("fr")
     else if (browserLocale.startsWith("pt")) setLocale("pt-BR")
     else if (browserLocale.startsWith("es")) setLocale("es")
     else setLocale("en")
   }, [])
+
+  const handleLocaleChange = (newLocale: "en" | "fr" | "pt-BR" | "es") => {
+    setLocale(newLocale)
+    localStorage.setItem("revosso-locale", newLocale)
+  }
+
+  const localeLabels: Record<"en" | "fr" | "pt-BR" | "es", string> = {
+    en: "EN",
+    fr: "FR",
+    "pt-BR": "PT",
+    es: "ES",
+  }
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
@@ -305,6 +329,26 @@ export default function LandingPage() {
             </nav>
 
             <div className="hidden lg:flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-slate-300 hover:text-blue-400 gap-1.5 px-2">
+                    <Globe className="h-4 w-4" />
+                    <span className="text-sm font-medium">{localeLabels[locale]}</span>
+                    <ChevronDown className="h-3 w-3 opacity-70" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700 min-w-[90px]">
+                  {(["en", "fr", "pt-BR", "es"] as const).map((l) => (
+                    <DropdownMenuItem
+                      key={l}
+                      onClick={() => handleLocaleChange(l)}
+                      className={`cursor-pointer ${locale === l ? "text-blue-400 font-medium" : "text-slate-300"}`}
+                    >
+                      {localeLabels[l]}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={() => setIsContactOpen(true)}
@@ -345,7 +389,25 @@ export default function LandingPage() {
                     {item.name}
                   </Link>
                 ))}
-                <div className="pt-4">
+                <div className="pt-2 border-t border-slate-800">
+                  <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">Language</p>
+                  <div className="flex gap-2">
+                    {(["en", "fr", "pt-BR", "es"] as const).map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => handleLocaleChange(l)}
+                        className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                          locale === l
+                            ? "bg-blue-600 text-white"
+                            : "text-slate-400 hover:text-white hover:bg-slate-800"
+                        }`}
+                      >
+                        {localeLabels[l]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-2">
                   <Button
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                     onClick={() => {

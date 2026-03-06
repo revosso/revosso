@@ -10,6 +10,7 @@ const nextConfig = {
     unoptimized: true,
   },
   allowedDevOrigins: ["revosso.local", "manage.revosso.local"],
+  devIndicators: false,
 }
 
 export default nextConfig
