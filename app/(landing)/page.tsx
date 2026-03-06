@@ -28,11 +28,9 @@ import {
   Shield,
   Zap,
   Layers,
-  Building2,
   TrendingUp,
   Server,
   Database,
-  Lock,
 } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import {
@@ -48,7 +46,7 @@ const translations = {
     nav: {
       approach: "Approach",
       services: "Services",
-      industries: "Industries",
+      industries: "Solutions",
       contact: "Contact",
     },
     hero: {
@@ -112,14 +110,15 @@ const translations = {
       ],
     },
     industries: {
-      title: "Built for Ambitious Businesses",
+      title: "Our Engineering Capabilities",
+      subtitle: "From building new systems from scratch to rescuing legacy code — we cover the full spectrum of custom software engineering.",
       items: [
-        { title: "Financial Services", description: "Secure financial platforms and compliant systems for critical operations" },
-        { title: "Digital Commerce", description: "High-performance digital commerce platforms" },
-        { title: "Enterprise Operations", description: "Enterprise software systems and scalable infrastructure for large organizations" },
-        { title: "Tech-Driven Startups", description: "Platform foundations for technology startups and scale-ups" },
+        { title: "Custom Software Development", description: "We design and build tailor-made platforms, applications, and digital systems from the ground up — aligned to your exact business requirements and long-term goals." },
+        { title: "System Takeover & Modernization", description: "We take ownership of existing codebases, stabilize them, eliminate technical debt, and modernize architecture to bring aging systems up to current standards." },
+        { title: "Technical Consulting & Architecture", description: "We advise on system design, technology stack selection, and scalability strategy — helping you make the right technical decisions before and during development." },
+        { title: "Long-term Maintenance & Scaling", description: "We provide continuous technical ownership of your systems — performance monitoring, iterative improvements, and scaling your platform as your business grows." },
       ],
-      cta: "Discuss Your Industry Needs",
+      cta: "Discuss Your Project",
     },
     clients: {
       title: "Trusted by Businesses & Partners",
@@ -183,7 +182,7 @@ const translations = {
         platformEngineering: "Platform Engineering",
         infrastructure: "Infrastructure",
         ourApproach: "Our Approach",
-        industries: "Industries",
+        industries: "Solutions",
         contact: "Contact",
         privacy: "Privacy",
         terms: "Terms",
@@ -197,7 +196,7 @@ const translations = {
     nav: {
       approach: "Approche",
       services: "Services",
-      industries: "Secteurs",
+      industries: "Solutions",
       contact: "Contact",
     },
     hero: {
@@ -261,14 +260,15 @@ const translations = {
       ],
     },
     industries: {
-      title: "Conçu pour Entreprises Ambitieuses",
+      title: "Nos Capacités d'Ingénierie",
+      subtitle: "De la construction de nouveaux systèmes à la modernisation de l'existant — nous couvrons tout le spectre de l'ingénierie logicielle sur mesure.",
       items: [
-        { title: "Services Financiers", description: "Plateformes financières sécurisées et systèmes conformes pour les opérations critiques" },
-        { title: "Commerce Numérique", description: "Plateformes de commerce numérique haute performance" },
-        { title: "Opérations d'Entreprise", description: "Systèmes logiciels d'entreprise et infrastructure évolutive pour les grandes organisations" },
-        { title: "Startups Technologiques", description: "Fondations plateforme pour startups et scale-ups technologiques" },
+        { title: "Développement Logiciel Sur Mesure", description: "Nous concevons et développons des plateformes, applications et systèmes numériques sur mesure dès l'origine — alignés sur vos besoins métier exacts et vos objectifs à long terme." },
+        { title: "Reprise & Modernisation de Systèmes", description: "Nous prenons en charge les codebases existants, les stabilisons, éliminons la dette technique et modernisons l'architecture pour remettre vos systèmes à niveau." },
+        { title: "Conseil Technique & Architecture", description: "Nous conseillons sur la conception de systèmes, le choix des technologies et la stratégie de scalabilité — pour guider vos décisions techniques avant et pendant le développement." },
+        { title: "Maintenance & Évolution Long Terme", description: "Nous assurons la propriété technique continue de vos systèmes — surveillance des performances, améliorations itératives et évolution de votre plateforme avec votre croissance." },
       ],
-      cta: "Discuter de Vos Besoins Sectoriels",
+      cta: "Discuter de Votre Projet",
     },
     clients: {
       title: "Reconnu par Entreprises & Partenaires",
@@ -332,7 +332,7 @@ const translations = {
         platformEngineering: "Ingénierie de Plateforme",
         infrastructure: "Infrastructure",
         ourApproach: "Notre Approche",
-        industries: "Secteurs",
+        industries: "Solutions",
         contact: "Contact",
         privacy: "Confidentialité",
         terms: "Conditions",
@@ -346,7 +346,7 @@ const translations = {
     nav: {
       approach: "Abordagem",
       services: "Serviços",
-      industries: "Setores",
+      industries: "Soluções",
       contact: "Contato",
     },
     hero: {
@@ -410,14 +410,15 @@ const translations = {
       ],
     },
     industries: {
-      title: "Construído para Empresas Ambiciosas",
+      title: "Nossas Capacidades de Engenharia",
+      subtitle: "Da construção de novos sistemas à modernização de legados — cobrimos todo o espectro da engenharia de software sob medida.",
       items: [
-        { title: "Serviços Financeiros", description: "Plataformas financeiras seguras e sistemas em conformidade para operações críticas" },
-        { title: "Comércio Digital", description: "Plataformas de comércio digital de alto desempenho" },
-        { title: "Operações Empresariais", description: "Sistemas de software empresarial e infraestrutura escalável para grandes organizações" },
-        { title: "Startups Tecnológicas", description: "Fundações de plataforma para startups e scale-ups de tecnologia" },
+        { title: "Desenvolvimento de Software Sob Medida", description: "Projetamos e construímos plataformas, aplicações e sistemas digitais sob medida desde o início — alinhados às suas necessidades exatas e objetivos de longo prazo." },
+        { title: "Assunção & Modernização de Sistemas", description: "Assumimos a gestão de codebases existentes, os estabilizamos, eliminamos a dívida técnica e modernizamos a arquitetura para trazer sistemas legados ao padrão atual." },
+        { title: "Consultoria Técnica & Arquitetura", description: "Assessoramos sobre design de sistemas, seleção de tecnologias e estratégia de escalabilidade — ajudando você a tomar as decisões técnicas certas antes e durante o desenvolvimento." },
+        { title: "Manutenção & Evolução de Longo Prazo", description: "Fornecemos propriedade técnica contínua dos seus sistemas — monitoramento de desempenho, melhorias iterativas e escalabilidade conforme seu negócio cresce." },
       ],
-      cta: "Discutir Suas Necessidades do Setor",
+      cta: "Discutir Seu Projeto",
     },
     clients: {
       title: "Confiado por Empresas & Parceiros",
@@ -481,7 +482,7 @@ const translations = {
         platformEngineering: "Engenharia de Plataforma",
         infrastructure: "Infraestrutura",
         ourApproach: "Nossa Abordagem",
-        industries: "Setores",
+        industries: "Soluções",
         contact: "Contato",
         privacy: "Privacidade",
         terms: "Termos",
@@ -495,7 +496,7 @@ const translations = {
     nav: {
       approach: "Enfoque",
       services: "Servicios",
-      industries: "Industrias",
+      industries: "Soluciones",
       contact: "Contacto",
     },
     hero: {
@@ -559,14 +560,15 @@ const translations = {
       ],
     },
     industries: {
-      title: "Construido para Empresas Ambiciosas",
+      title: "Nuestras Capacidades de Ingeniería",
+      subtitle: "Desde la construcción de nuevos sistemas hasta la modernización de legados — cubrimos todo el espectro de la ingeniería de software a medida.",
       items: [
-        { title: "Servicios Financieros", description: "Plataformas financieras seguras y sistemas conformes para operaciones críticas" },
-        { title: "Comercio Digital", description: "Plataformas de comercio digital de alto rendimiento" },
-        { title: "Operaciones Empresariales", description: "Sistemas de software empresarial e infraestructura escalable para grandes organizaciones" },
-        { title: "Startups Tecnológicas", description: "Bases de plataforma para startups y scale-ups de tecnología" },
+        { title: "Desarrollo de Software a Medida", description: "Diseñamos y desarrollamos plataformas, aplicaciones y sistemas digitales a medida desde el inicio — alineados con sus necesidades exactas y objetivos a largo plazo." },
+        { title: "Asunción & Modernización de Sistemas", description: "Tomamos la gestión de codebases existentes, los estabilizamos, eliminamos la deuda técnica y modernizamos la arquitectura para actualizar sistemas legados." },
+        { title: "Consultoría Técnica & Arquitectura", description: "Asesoramos sobre diseño de sistemas, selección de tecnologías y estrategia de escalabilidad — ayudándole a tomar las decisiones técnicas correctas antes y durante el desarrollo." },
+        { title: "Mantenimiento & Evolución a Largo Plazo", description: "Proporcionamos propiedad técnica continua de sus sistemas — monitoreo de rendimiento, mejoras iterativas y escalabilidad de su plataforma a medida que crece su negocio." },
       ],
-      cta: "Discutir Sus Necesidades del Sector",
+      cta: "Discutir Su Proyecto",
     },
     clients: {
       title: "Confiado por Empresas y Socios",
@@ -630,7 +632,7 @@ const translations = {
         platformEngineering: "Ingeniería de Plataforma",
         infrastructure: "Infraestructura",
         ourApproach: "Nuestro Enfoque",
-        industries: "Industrias",
+        industries: "Soluciones",
         contact: "Contacto",
         privacy: "Privacidad",
         terms: "Términos",
@@ -647,17 +649,22 @@ const translations = {
 const clients = [
   { name: "Cashlakay", url: "https://cashlakay.com", description: "Custom platform development" },
   { name: "Revofin", url: "https://finance.revosso.com", description: "Financial platform hosting" },
-  { name: "Rechajem", url: "https://rechajem-dev.revosso.com/", description: "Platform development" },
-  { name: "Nuvann", url: "https://staging.nuvann.com", description: "Platform hosting" },
+  { name: "Rechajem", url: "https://rechajem.revosso.com", description: "Platform development" },
+  { name: "Nuvann", url: "https://nuvann.com", description: "Platform hosting" },
 ]
 
 export default function LandingPage() {
+  const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedInterest, setSelectedInterest] = useState<string>("")
   const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Detect browser locale on mount
   useEffect(() => {
@@ -738,8 +745,10 @@ export default function LandingPage() {
     }
   }
 
+  if (!mounted) return null
+
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" suppressHydrationWarning>
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
@@ -764,7 +773,7 @@ export default function LandingPage() {
               {[
                 { name: translations[locale].nav.approach, href: "#approach" },
                 { name: translations[locale].nav.services, href: "#services" },
-                { name: translations[locale].nav.industries, href: "#industries" },
+                { name: translations[locale].nav.industries, href: "#solutions" },
                 { name: translations[locale].nav.contact, href: "#contact" },
               ].map((item) => (
                 <Link
@@ -802,7 +811,7 @@ export default function LandingPage() {
                 {[
                   { name: translations[locale].nav.approach, href: "#approach" },
                   { name: translations[locale].nav.services, href: "#services" },
-                  { name: translations[locale].nav.industries, href: "#industries" },
+                  { name: translations[locale].nav.industries, href: "#solutions" },
                   { name: translations[locale].nav.contact, href: "#contact" },
                 ].map((item) => (
                   <Link
@@ -1051,29 +1060,32 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Industries Section */}
-        <section id="industries" className="py-20 lg:py-32 bg-slate-950">
+        {/* Capabilities Section */}
+        <section id="solutions" className="py-20 lg:py-32 bg-slate-950">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
                 {translations[locale].industries.title}
               </h2>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto mt-4 leading-relaxed">
+                {translations[locale].industries.subtitle}
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
               {[
-                { icon: Building2, ...translations[locale].industries.items[0] },
+                { icon: Code, ...translations[locale].industries.items[0] },
                 { icon: TrendingUp, ...translations[locale].industries.items[1] },
-                { icon: Server, ...translations[locale].industries.items[2] },
-                { icon: Zap, ...translations[locale].industries.items[3] },
-              ].map((industry, index) => (
+                { icon: Layers, ...translations[locale].industries.items[2] },
+                { icon: Server, ...translations[locale].industries.items[3] },
+              ].map((capability, index) => (
                 <Card key={index} className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
                   <CardContent className="p-8 space-y-4">
                     <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-                      <industry.icon className="h-8 w-8 text-white" />
+                      <capability.icon className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white">{industry.title}</h3>
-                    <p className="text-slate-300 leading-relaxed">{industry.description}</p>
+                    <h3 className="text-2xl font-bold text-white">{capability.title}</h3>
+                    <p className="text-slate-300 leading-relaxed">{capability.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -1329,6 +1341,11 @@ export default function LandingPage() {
               <p className="text-slate-400 leading-relaxed">
                 {translations[locale].footer.description}
               </p>
+              <p className="text-slate-400 text-sm">
+                <a href="mailto:contact@revosso.com" className="hover:text-white transition-colors">
+                  contact@revosso.com
+                </a>
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -1361,7 +1378,7 @@ export default function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#industries" className="hover:text-white transition-colors">
+                  <Link href="#solutions" className="hover:text-white transition-colors">
                     {translations[locale].footer.links.industries}
                   </Link>
                 </li>
@@ -1399,12 +1416,6 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{translations[locale].footer.contact}</h3>
-              <div className="space-y-2 text-slate-400">
-                <p>contact@revosso.com</p>
-              </div>
-            </div>
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
