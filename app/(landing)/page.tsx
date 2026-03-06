@@ -52,18 +52,18 @@ const translations = {
       contact: "Contact",
     },
     hero: {
-      h1: "Engineering, Operating & Scaling Digital Platforms",
-      subheadline: "We build custom software, modernize existing systems, and manage scalable infrastructure for businesses relying on robust digital platforms.",
+      h1: "Custom Software, Platform Engineering & Scalable Infrastructure",
+      subheadline: "We build custom software platforms, modernize existing systems, and operate scalable infrastructure for organizations that depend on reliable digital systems.",
       primaryCta: "Discuss Your Project",
       secondaryCta: "Explore Our Approach",
     },
     whoWeAre: {
       title: "Digital Infrastructure. Built for Scale.",
-      intro: "Revosso is a digital infrastructure and platform engineering company focused on building secure, scalable, and maintainable systems.",
-      partnerTitle: "We partner with businesses that need:",
+      intro: "Revosso is a digital infrastructure and platform engineering company. We build and operate mission-critical systems and long-term digital foundations for enterprises and product-led businesses.",
+      partnerTitle: "We partner with organizations that need:",
       requirements: [
         "Robust backend architecture",
-        "High-performance platforms",
+        "High-performance digital platforms",
         "Secure financial and operational systems",
         "Long-term technical scalability",
       ],
@@ -71,14 +71,14 @@ const translations = {
     },
     platformLifecycle: {
       title: "From Architecture to Operation",
-      subtitle: "Full lifecycle platform engineering: build, take over, and operate.",
+      subtitle: "We build new platforms from scratch, take over and optimize existing systems, and operate and scale your infrastructure.",
       build: {
         title: "BUILD",
-        description: "We design and develop custom digital platforms aligned with your business model and long-term growth.",
+        description: "We design and develop custom digital platforms from the ground up, aligned with your business goals and long-term growth.",
       },
       takeOver: {
         title: "TAKE OVER & OPTIMIZE",
-        intro: "We take ownership of existing systems to:",
+        intro: "We take ownership of existing platforms and systems to:",
         items: [
           "Stabilize and refactor codebases",
           "Enhance performance",
@@ -89,7 +89,7 @@ const translations = {
       },
       operate: {
         title: "OPERATE & SCALE",
-        intro: "We manage infrastructure and platform operations, including:",
+        intro: "We run and scale your infrastructure and platform operations, including:",
         items: [
           "Secure hosting",
           "Performance monitoring",
@@ -114,10 +114,10 @@ const translations = {
     industries: {
       title: "Built for Ambitious Businesses",
       items: [
-        { title: "Financial Services", description: "Secure, compliant systems for financial operations" },
-        { title: "Digital Commerce", description: "High-performance e-commerce platforms" },
-        { title: "Enterprise Operations", description: "Scalable infrastructure for large organizations" },
-        { title: "Tech-Driven Startups", description: "Foundation systems for rapid growth" },
+        { title: "Financial Services", description: "Secure financial platforms and compliant systems for critical operations" },
+        { title: "Digital Commerce", description: "High-performance digital commerce platforms" },
+        { title: "Enterprise Operations", description: "Enterprise software systems and scalable infrastructure for large organizations" },
+        { title: "Tech-Driven Startups", description: "Platform foundations for technology startups and scale-ups" },
       ],
       cta: "Discuss Your Industry Needs",
     },
@@ -140,7 +140,7 @@ const translations = {
         hosting: "Infrastructure & Hosting",
         partnership: "Partnership Inquiry",
       },
-      description: "Tell us about your project and we'll respond within 24 hours.",
+      description: "Tell us about your project. We respond within 24 hours.",
       fields: {
         name: "Name",
         email: "Email",
@@ -173,7 +173,7 @@ const translations = {
       },
     },
     footer: {
-      description: "Digital infrastructure and platform engineering for scalable growth.",
+      description: "Digital infrastructure, platform engineering, and scalable systems for enterprise growth.",
       services: "Services",
       company: "Company",
       legal: "Legal",
@@ -201,33 +201,33 @@ const translations = {
       contact: "Contact",
     },
     hero: {
-      h1: "Ingénierie, Exploitation et Mise à l'Échelle de Plateformes Numériques",
-      subheadline: "Nous développons des logiciels sur mesure, modernisons les systèmes existants et gérons des infrastructures évolutives pour les entreprises reposant sur des plateformes numériques robustes.",
+      h1: "Logiciel Sur Mesure, Ingénierie de Plateforme & Infrastructures Évolutives",
+      subheadline: "Nous concevons et construisons des plateformes logicielles sur mesure, modernisons les systèmes existants et exploitons des infrastructures évolutives pour les organisations qui dépendent de systèmes numériques fiables.",
       primaryCta: "Discuter de Votre Projet",
       secondaryCta: "Explorer Notre Approche",
     },
     whoWeAre: {
       title: "Infrastructure Numérique. Conçue pour l'Échelle.",
-      intro: "Revosso est une société d'ingénierie d'infrastructure et de plateformes numériques spécialisée dans la création de systèmes sécurisés, évolutifs et maintenables.",
-      partnerTitle: "Nous collaborons avec des entreprises qui ont besoin de:",
+      intro: "Revosso est une société d'ingénierie d'infrastructure et de plateformes numériques. Nous concevons et exploitons des systèmes critiques et des fondations numériques pérennes pour les entreprises et les acteurs produit.",
+      partnerTitle: "Nous collaborons avec les organisations qui ont besoin de :",
       requirements: [
         "Architecture backend robuste",
-        "Plateformes haute performance",
+        "Plateformes numériques haute performance",
         "Systèmes financiers et opérationnels sécurisés",
         "Scalabilité technique à long terme",
       ],
-      closing: "Nous ne fournissons pas de solutions à court terme.\nNous concevons des fondations numériques.",
+      closing: "Nous ne livrons pas de solutions à court terme.\nNous concevons des fondations numériques.",
     },
     platformLifecycle: {
       title: "De l'Architecture à l'Exploitation",
-      subtitle: "Ingénierie de plateforme sur l'ensemble du cycle de vie : construire, reprendre et exploiter.",
+      subtitle: "Nous construisons de nouvelles plateformes, reprenons et optimisons les systèmes existants, et exploitons et faisons évoluer votre infrastructure.",
       build: {
         title: "CONSTRUIRE",
-        description: "Nous concevons et développons des plateformes numériques sur mesure alignées avec votre modèle d'affaires et votre croissance à long terme.",
+        description: "Nous concevons et développons des plateformes numériques sur mesure dès l'origine, alignées sur vos objectifs métier et votre croissance à long terme.",
       },
       takeOver: {
         title: "REPRENDRE & OPTIMISER",
-        intro: "Nous prenons en charge les systèmes existants pour :",
+        intro: "Nous prenons en charge les plateformes et systèmes existants pour :",
         items: [
           "Stabiliser et refactoriser le code",
           "Améliorer les performances",
@@ -238,13 +238,13 @@ const translations = {
       },
       operate: {
         title: "EXPLOITER & ÉVOLUER",
-        intro: "Nous gérons l'infrastructure et les opérations de plateforme, incluant :",
+        intro: "Nous exploitons et faisons évoluer votre infrastructure et vos opérations plateforme, notamment :",
         items: [
           "Hébergement sécurisé",
           "Surveillance des performances",
           "Déploiement cloud",
           "Maintenance technique continue",
-          "Scalabilité de l'infrastructure",
+          "Évolution de l'infrastructure",
         ],
       },
       cta: "Discuter de Vos Besoins de Plateforme",
@@ -263,10 +263,10 @@ const translations = {
     industries: {
       title: "Conçu pour Entreprises Ambitieuses",
       items: [
-        { title: "Services Financiers", description: "Systèmes sécurisés et conformes pour les opérations financières" },
-        { title: "Commerce Numérique", description: "Plateformes e-commerce haute performance" },
-        { title: "Opérations d'Entreprise", description: "Infrastructure évolutive pour grandes organisations" },
-        { title: "Startups Technologiques", description: "Systèmes de base pour une croissance rapide" },
+        { title: "Services Financiers", description: "Plateformes financières sécurisées et systèmes conformes pour les opérations critiques" },
+        { title: "Commerce Numérique", description: "Plateformes de commerce numérique haute performance" },
+        { title: "Opérations d'Entreprise", description: "Systèmes logiciels d'entreprise et infrastructure évolutive pour les grandes organisations" },
+        { title: "Startups Technologiques", description: "Fondations plateforme pour startups et scale-ups technologiques" },
       ],
       cta: "Discuter de Vos Besoins Sectoriels",
     },
@@ -289,20 +289,20 @@ const translations = {
         hosting: "Infrastructure & Hébergement",
         partnership: "Demande de Partenariat",
       },
-      description: "Parlez-nous de votre projet, nous répondrons sous 24 heures.",
+      description: "Décrivez-nous votre projet. Nous répondons sous 24 heures.",
       fields: {
         name: "Nom",
         email: "Email",
         company: "Entreprise",
-        need: "De quoi avez-vous besoin?",
+        need: "De quoi avez-vous besoin ?",
         message: "Message",
         needPlaceholder: "Sélectionnez votre besoin",
-        messagePlaceholder: "Parlez-nous de votre projet...",
+        messagePlaceholder: "Décrivez-nous votre projet...",
       },
       options: {
         newPlatform: "Développement de Nouvelle Plateforme",
-        takeover: "Reprise & Optimisation",
-        maintenance: "Maintenance",
+        takeover: "Reprise & Optimisation de Plateforme",
+        maintenance: "Maintenance de Plateforme",
         hosting: "Infrastructure & Hébergement",
         partnership: "Partenariat",
         general: "Demande Générale",
@@ -322,7 +322,7 @@ const translations = {
       },
     },
     footer: {
-      description: "Ingénierie d'infrastructure et de plateformes numériques pour une croissance évolutive.",
+      description: "Infrastructure numérique, ingénierie de plateforme et systèmes évolutifs pour la croissance des entreprises.",
       services: "Services",
       company: "Entreprise",
       legal: "Légal",
@@ -350,33 +350,33 @@ const translations = {
       contact: "Contato",
     },
     hero: {
-      h1: "Engenharia, Operação e Escalabilidade de Plataformas Digitais",
-      subheadline: "Desenvolvemos software personalizado, modernizamos sistemas existentes e gerenciamos infraestrutura escalável para empresas que dependem de plataformas digitais robustas.",
+      h1: "Software Sob Medida, Engenharia de Plataforma e Infraestrutura Escalável",
+      subheadline: "Desenvolvemos plataformas de software sob medida, modernizamos sistemas existentes e operamos infraestrutura escalável para organizações que dependem de sistemas digitais confiáveis.",
       primaryCta: "Discutir Seu Projeto",
       secondaryCta: "Explorar Nossa Abordagem",
     },
     whoWeAre: {
       title: "Infraestrutura Digital. Construída para Escala.",
-      intro: "A Revosso é uma empresa de engenharia de infraestrutura e plataformas digitais focada em criar sistemas seguros, escaláveis e sustentáveis.",
-      partnerTitle: "Trabalhamos com empresas que necessitam de:",
+      intro: "A Revosso é uma empresa de engenharia de infraestrutura e plataformas digitais. Construímos e operamos sistemas de missão crítica e bases digitais de longo prazo para empresas e negócios orientados a produto.",
+      partnerTitle: "Trabalhamos com organizações que precisam de:",
       requirements: [
         "Arquitetura backend robusta",
-        "Plataformas de alto desempenho",
+        "Plataformas digitais de alto desempenho",
         "Sistemas financeiros e operacionais seguros",
         "Escalabilidade técnica de longo prazo",
       ],
-      closing: "Não fornecemos soluções de curto prazo.\nProjetamos fundações digitais.",
+      closing: "Não entregamos soluções de curto prazo.\nProjetamos fundações digitais.",
     },
     platformLifecycle: {
       title: "Da Arquitetura à Operação",
-      subtitle: "Engenharia de plataforma em todo o ciclo de vida: construir, assumir e operar.",
+      subtitle: "Construímos novas plataformas do zero, assumimos e otimizamos sistemas existentes e operamos e escalamos sua infraestrutura.",
       build: {
         title: "CONSTRUIR",
-        description: "Projetamos e desenvolvemos plataformas digitais personalizadas alinhadas ao seu modelo de negócios e crescimento a longo prazo.",
+        description: "Projetamos e desenvolvemos plataformas digitais sob medida desde o início, alinhadas aos seus objetivos de negócio e crescimento de longo prazo.",
       },
       takeOver: {
         title: "ASSUMIR & OTIMIZAR",
-        intro: "Assumimos a propriedade de sistemas existentes para:",
+        intro: "Assumimos a gestão de plataformas e sistemas existentes para:",
         items: [
           "Estabilizar e refatorar código",
           "Melhorar desempenho",
@@ -387,7 +387,7 @@ const translations = {
       },
       operate: {
         title: "OPERAR & ESCALAR",
-        intro: "Gerenciamos infraestrutura e operações de plataforma, incluindo:",
+        intro: "Operamos e escalamos sua infraestrutura e operações de plataforma, incluindo:",
         items: [
           "Hospedagem segura",
           "Monitoramento de desempenho",
@@ -406,16 +406,16 @@ const translations = {
         { title: "Segurança em primeiro lugar", description: "Proteção integrada desde a fundação" },
         { title: "Código limpo e sustentável", description: "Código que resiste ao tempo" },
         { title: "Performance como referência", description: "Velocidade e eficiência por design" },
-        { title: "Infraestrutura robusta", description: "Sistemas confiáveis nos quais você pode confiar" },
+        { title: "Infraestrutura robusta", description: "Sistemas confiáveis nos quais você pode contar" },
       ],
     },
     industries: {
       title: "Construído para Empresas Ambiciosas",
       items: [
-        { title: "Serviços Financeiros", description: "Sistemas seguros e compatíveis para operações financeiras" },
-        { title: "Comércio Digital", description: "Plataformas de e-commerce de alto desempenho" },
-        { title: "Operações Empresariais", description: "Infraestrutura escalável para grandes organizações" },
-        { title: "Startups Tecnológicas", description: "Sistemas de base para crescimento rápido" },
+        { title: "Serviços Financeiros", description: "Plataformas financeiras seguras e sistemas em conformidade para operações críticas" },
+        { title: "Comércio Digital", description: "Plataformas de comércio digital de alto desempenho" },
+        { title: "Operações Empresariais", description: "Sistemas de software empresarial e infraestrutura escalável para grandes organizações" },
+        { title: "Startups Tecnológicas", description: "Fundações de plataforma para startups e scale-ups de tecnologia" },
       ],
       cta: "Discutir Suas Necessidades do Setor",
     },
@@ -426,7 +426,7 @@ const translations = {
     finalCta: {
       title: "Vamos Construir a Infraestrutura por Trás do Seu Crescimento",
       subtitle: "Discuta os requisitos do seu projeto e descubra como podemos criar soluções escaláveis para o seu negócio.",
-      trust: "Formamos parcerias de longo prazo baseadas em engenharia estruturada, estabilidade operacional e evolução contínua da plataforma. Priorizamos clareza arquitetural e propriedade técnica sobre soluções rápidas.",
+      trust: "Formamos parcerias de longo prazo baseadas em engenharia estruturada, estabilidade operacional e evolução contínua da plataforma. Priorizamos clareza arquitetural e propriedade técnica em vez de soluções rápidas.",
       button: "Entre em Contato",
     },
     contact: {
@@ -438,7 +438,7 @@ const translations = {
         hosting: "Infraestrutura & Hospedagem",
         partnership: "Consulta de Parceria",
       },
-      description: "Conte-nos sobre seu projeto e responderemos em até 24 horas.",
+      description: "Conte-nos sobre seu projeto. Respondemos em até 24 horas.",
       fields: {
         name: "Nome",
         email: "Email",
@@ -471,7 +471,7 @@ const translations = {
       },
     },
     footer: {
-      description: "Engenharia de infraestrutura digital e plataformas para crescimento escalável.",
+      description: "Infraestrutura digital, engenharia de plataforma e sistemas escaláveis para o crescimento empresarial.",
       services: "Serviços",
       company: "Empresa",
       legal: "Legal",
@@ -499,33 +499,33 @@ const translations = {
       contact: "Contacto",
     },
     hero: {
-      h1: "Ingeniería, Operación y Escalabilidad de Plataformas Digitales",
-      subheadline: "Creamos software personalizado, modernizamos sistemas existentes y gestionamos infraestructura escalable para empresas que dependen de plataformas digitales sólidas.",
+      h1: "Software a Medida, Ingeniería de Plataforma e Infraestructura Escalable",
+      subheadline: "Desarrollamos plataformas de software a medida, modernizamos sistemas existentes y operamos infraestructura escalable para organizaciones que dependen de sistemas digitales confiables.",
       primaryCta: "Discutir Su Proyecto",
       secondaryCta: "Explorar Nuestro Enfoque",
     },
     whoWeAre: {
       title: "Infraestructura Digital. Construida para Escala.",
-      intro: "Revosso es una empresa de ingeniería de infraestructura y plataformas digitales enfocada en construir sistemas seguros, escalables y sostenibles.",
-      partnerTitle: "Trabajamos con empresas que necesitan:",
+      intro: "Revosso es una empresa de ingeniería de infraestructura y plataformas digitales. Construimos y operamos sistemas de misión crítica y bases digitales de largo plazo para empresas y negocios orientados a producto.",
+      partnerTitle: "Trabajamos con organizaciones que necesitan:",
       requirements: [
         "Arquitectura backend robusta",
-        "Plataformas de alto rendimiento",
+        "Plataformas digitales de alto rendimiento",
         "Sistemas financieros y operativos seguros",
         "Escalabilidad técnica a largo plazo",
       ],
-      closing: "No entregamos soluciones a corto plazo.\nIngeniamos bases digitales duraderas.",
+      closing: "No entregamos soluciones a corto plazo.\nIngeniamos bases digitales.",
     },
     platformLifecycle: {
       title: "De la Arquitectura a la Operación",
-      subtitle: "Ingeniería de plataforma de ciclo completo: construir, asumir y operar.",
+      subtitle: "Construimos nuevas plataformas desde cero, asumimos y optimizamos sistemas existentes, y operamos y escalamos su infraestructura.",
       build: {
         title: "CONSTRUIR",
-        description: "Diseñamos y desarrollamos plataformas digitales personalizadas alineadas con su modelo de negocio y crecimiento a largo plazo.",
+        description: "Diseñamos y desarrollamos plataformas digitales a medida desde el inicio, alineadas con sus objetivos de negocio y crecimiento a largo plazo.",
       },
       takeOver: {
         title: "ASUMIR & OPTIMIZAR",
-        intro: "Asumimos sistemas existentes para:",
+        intro: "Asumimos la gestión de plataformas y sistemas existentes para:",
         items: [
           "Estabilizar y refactorizar el código",
           "Mejorar el rendimiento",
@@ -536,7 +536,7 @@ const translations = {
       },
       operate: {
         title: "OPERAR & ESCALAR",
-        intro: "Gestionamos infraestructura y operaciones de plataforma, incluyendo:",
+        intro: "Operamos y escalamos su infraestructura y operaciones de plataforma, incluyendo:",
         items: [
           "Alojamiento seguro",
           "Monitoreo de rendimiento",
@@ -561,15 +561,15 @@ const translations = {
     industries: {
       title: "Construido para Empresas Ambiciosas",
       items: [
-        { title: "Servicios Financieros", description: "Sistemas seguros y conformes para operaciones financieras" },
-        { title: "Comercio Digital", description: "Plataformas de e-commerce de alto rendimiento" },
-        { title: "Operaciones Empresariales", description: "Infraestructura escalable para grandes organizaciones" },
-        { title: "Startups Tecnológicas", description: "Sistemas base para crecimiento rápido" },
+        { title: "Servicios Financieros", description: "Plataformas financieras seguras y sistemas conformes para operaciones críticas" },
+        { title: "Comercio Digital", description: "Plataformas de comercio digital de alto rendimiento" },
+        { title: "Operaciones Empresariales", description: "Sistemas de software empresarial e infraestructura escalable para grandes organizaciones" },
+        { title: "Startups Tecnológicas", description: "Bases de plataforma para startups y scale-ups de tecnología" },
       ],
       cta: "Discutir Sus Necesidades del Sector",
     },
     clients: {
-      title: "Confiado por Empresas & Socios",
+      title: "Confiado por Empresas y Socios",
       copy: "Colaboramos con empresas y plataformas para ofrecer soluciones seguras, escalables y de alto rendimiento.",
     },
     finalCta: {
@@ -582,12 +582,12 @@ const translations = {
       title: {
         default: "Contáctenos",
         newPlatform: "Desarrollo de Nueva Plataforma",
-        takeover: "Asunción & Optimización de Plataforma",
+        takeover: "Asunción y Optimización de Plataforma",
         maintenance: "Mantenimiento de Plataforma",
-        hosting: "Infraestructura & Alojamiento",
+        hosting: "Infraestructura y Alojamiento",
         partnership: "Consulta de Asociación",
       },
-      description: "Cuéntenos sobre su proyecto y le responderemos en 24 horas.",
+      description: "Cuéntenos sobre su proyecto. Respondemos en 24 horas.",
       fields: {
         name: "Nombre",
         email: "Correo electrónico",
@@ -599,9 +599,9 @@ const translations = {
       },
       options: {
         newPlatform: "Desarrollo de Nueva Plataforma",
-        takeover: "Asunción & Optimización",
-        maintenance: "Mantenimiento",
-        hosting: "Infraestructura & Alojamiento",
+        takeover: "Asunción y Optimización de Plataforma",
+        maintenance: "Mantenimiento de Plataforma",
+        hosting: "Infraestructura y Alojamiento",
         partnership: "Asociación",
         general: "Consulta General",
       },
@@ -620,13 +620,13 @@ const translations = {
       },
     },
     footer: {
-      description: "Ingeniería de infraestructura digital y plataformas para crecimiento escalable.",
+      description: "Infraestructura digital, ingeniería de plataforma y sistemas escalables para el crecimiento empresarial.",
       services: "Servicios",
       company: "Empresa",
       legal: "Legal",
       contact: "Contacto",
       links: {
-        customPlatforms: "Plataformas Personalizadas",
+        customPlatforms: "Plataformas a Medida",
         platformEngineering: "Ingeniería de Plataforma",
         infrastructure: "Infraestructura",
         ourApproach: "Nuestro Enfoque",

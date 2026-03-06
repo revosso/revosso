@@ -39,8 +39,25 @@ const Auth0Context = createContext<Auth0ContextType | undefined>(undefined);
 const AUTH0_DOMAIN = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
 const AUTH0_CLIENT_ID = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
 const AUTH0_AUDIENCE = process.env.NEXT_PUBLIC_AUTH0_AUDIENCE!;
-const AUTH0_REDIRECT_URI = process.env.NEXT_PUBLIC_AUTH0_REDIRECT_URI || 
-  (typeof window !== 'undefined' ? `${window.location.origin}/callback` : 'http://localhost:3000/callback');
+
+// Dynamic redirect URI based on current domain
+function getRedirectUri(): string {
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3000/callback';
+  }
+  
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  const protocol = window.location.protocol;
+  
+  // Build the callback URL for the current domain
+  let baseUrl = `${protocol}//${hostname}`;
+  if (port) {
+    baseUrl += `:${port}`;
+  }
+  
+  return `${baseUrl}/callback`;
+}
 
 // Validate required environment variables
 if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID || !AUTH0_AUDIENCE) {
@@ -60,7 +77,7 @@ function getAuth0Client(): Auth0Client {
       domain: AUTH0_DOMAIN,
       clientId: AUTH0_CLIENT_ID,
       authorizationParams: {
-        redirect_uri: AUTH0_REDIRECT_URI,
+        redirect_uri: getRedirectUri(),
         audience: AUTH0_AUDIENCE,
         scope: 'openid profile email',
       },
@@ -121,7 +138,7 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
       const client = getAuth0Client();
       await client.loginWithRedirect({
         authorizationParams: {
-          redirect_uri: AUTH0_REDIRECT_URI,
+          redirect_uri: getRedirectUri(),
           audience: AUTH0_AUDIENCE,
           scope: 'openid profile email',
         },

@@ -14,7 +14,10 @@
     "start": "next start",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "setup": "./setup-local-dev.sh",
+    "dev:landing": "echo 'Opening landing page...' && open http://revosso.local:3000 2>/dev/null || xdg-open http://revosso.local:3000 2>/dev/null || echo 'Visit http://revosso.local:3000'",
+    "dev:dashboard": "echo 'Opening dashboard...' && open http://manage.revosso.local:3000 2>/dev/null || xdg-open http://manage.revosso.local:3000 2>/dev/null || echo 'Visit http://manage.revosso.local:3000'"
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.17.0",
