@@ -176,6 +176,7 @@ const translations = {
       description: "Digital infrastructure and platform engineering for scalable growth.",
       services: "Services",
       company: "Company",
+      legal: "Legal",
       contact: "Contact",
       links: {
         customPlatforms: "Custom Platforms",
@@ -184,6 +185,10 @@ const translations = {
         ourApproach: "Our Approach",
         industries: "Industries",
         contact: "Contact",
+        privacy: "Privacy",
+        terms: "Terms",
+        cookies: "Cookies",
+        security: "Security",
       },
       copyright: "All rights reserved.",
     },
@@ -320,6 +325,7 @@ const translations = {
       description: "Ingénierie d'infrastructure et de plateformes numériques pour une croissance évolutive.",
       services: "Services",
       company: "Entreprise",
+      legal: "Légal",
       contact: "Contact",
       links: {
         customPlatforms: "Plateformes Sur Mesure",
@@ -328,6 +334,10 @@ const translations = {
         ourApproach: "Notre Approche",
         industries: "Secteurs",
         contact: "Contact",
+        privacy: "Confidentialité",
+        terms: "Conditions",
+        cookies: "Cookies",
+        security: "Sécurité",
       },
       copyright: "Tous droits réservés.",
     },
@@ -464,6 +474,7 @@ const translations = {
       description: "Engenharia de infraestrutura digital e plataformas para crescimento escalável.",
       services: "Serviços",
       company: "Empresa",
+      legal: "Legal",
       contact: "Contato",
       links: {
         customPlatforms: "Plataformas Personalizadas",
@@ -472,6 +483,10 @@ const translations = {
         ourApproach: "Nossa Abordagem",
         industries: "Setores",
         contact: "Contato",
+        privacy: "Privacidade",
+        terms: "Termos",
+        cookies: "Cookies",
+        security: "Segurança",
       },
       copyright: "Todos os direitos reservados.",
     },
@@ -608,6 +623,7 @@ const translations = {
       description: "Ingeniería de infraestructura digital y plataformas para crecimiento escalable.",
       services: "Servicios",
       company: "Empresa",
+      legal: "Legal",
       contact: "Contacto",
       links: {
         customPlatforms: "Plataformas Personalizadas",
@@ -616,6 +632,10 @@ const translations = {
         ourApproach: "Nuestro Enfoque",
         industries: "Industrias",
         contact: "Contacto",
+        privacy: "Privacidad",
+        terms: "Términos",
+        cookies: "Cookies",
+        security: "Seguridad",
       },
       copyright: "Todos los derechos reservados.",
     },
@@ -1354,6 +1374,32 @@ export default function LandingPage() {
             </div>
 
             <div className="space-y-4">
+              <h3 className="text-lg font-semibold">{translations[locale].footer.legal}</h3>
+              <ul className="space-y-2 text-slate-400">
+                <li>
+                  <Link href="/privacy" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.privacy}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.terms}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cookies" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.cookies}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/security" className="hover:text-white transition-colors">
+                    {translations[locale].footer.links.security}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold">{translations[locale].footer.contact}</h3>
               <div className="space-y-2 text-slate-400">
                 <p>contact@revosso.com</p>
@@ -1361,8 +1407,25 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-400 text-sm">© {new Date().getFullYear()} Revosso. {translations[locale].footer.copyright}</p>
+            <div className="flex gap-4 text-slate-400 text-sm">
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                {translations[locale].footer.links.privacy}
+              </Link>
+              <span>·</span>
+              <Link href="/terms" className="hover:text-white transition-colors">
+                {translations[locale].footer.links.terms}
+              </Link>
+              <span>·</span>
+              <Link href="/security" className="hover:text-white transition-colors">
+                {translations[locale].footer.links.security}
+              </Link>
+              <span>·</span>
+              <Link href="/cookies" className="hover:text-white transition-colors">
+                {translations[locale].footer.links.cookies}
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

@@ -1,30 +1,39 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    const authHeader = request.headers.get("authorization")
-    const password = process.env.ADMIN_PASSWORD
+/**
+ * Next.js Middleware
+ * 
+ * Authentication Flow:
+ * - Frontend routes (/admin) are protected by client-side ProtectedRoute component
+ * - API routes (/api/admin) are protected by JWT validation middleware
+ * - This middleware is intentionally minimal for the PKCE flow
+ * 
+ * Note: With PKCE flow, tokens are stored in memory on the client.
+ * Server-side middleware cannot access these tokens.
+ * Protection is handled by:
+ * 1. Client-side: ProtectedRoute wrapper component
+ * 2. Server-side: JWT validation in API routes using JWKS
+ */
 
-    if (!password) {
-      return NextResponse.json({ error: "Admin not configured" }, { status: 500 })
-    }
-
-    if (!authHeader || authHeader !== `Basic ${Buffer.from(`admin:${password}`).toString("base64")}`) {
-      return new NextResponse("Unauthorized", {
-        status: 401,
-        headers: {
-          "WWW-Authenticate": 'Basic realm="Admin Access"',
-        },
-      })
-    }
-  }
-
-  return NextResponse.next()
+export default async function middleware(request: NextRequest) {
+  // Pass through all requests
+  // Authentication is handled by:
+  // - Client components for frontend routes
+  // - API route handlers for backend routes
+  return NextResponse.next();
 }
 
+// Minimal matcher - only for essential routes if needed
 export const config = {
-  matcher: "/admin/:path*",
+  matcher: [
+    /*
+     * Match all request paths except static files
+     * - _next/static (static files)
+     * - _next/image (image optimization)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|images).*)',
+  ],
 }
 

@@ -1,17 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { BarChart, Bell, Home, LayoutDashboard, LogOut, MessageSquare, Settings, User, Users } from "lucide-react"
+import { BarChart, Bell, Home, LayoutDashboard, MessageSquare, Settings, Users } from "lucide-react"
+import { Toaster } from "@/components/ui/sonner"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { AuthNav } from "@/components/auth-buttons"
 
 // Update the title and description
 export const metadata: Metadata = {
@@ -42,31 +36,7 @@ export default function AdminLayout({
               <Bell className="h-5 w-5" />
               <span className="sr-only">Notifications</span>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">Menu utilisateur</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Paramètres</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Se Déconnecter</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <AuthNav />
           </div>
         </div>
       </header>
@@ -146,6 +116,7 @@ export default function AdminLayout({
         </aside>
         <main className="flex-1 overflow-auto bg-background">{children}</main>
       </div>
+      <Toaster />
     </div>
   )
 }

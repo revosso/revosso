@@ -2,6 +2,7 @@ import type React from "react"
 import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
+import { Auth0Provider } from "@/components/auth0-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className} suppressHydrationWarning>
-        {children}
-        <Toaster />
+        <Auth0Provider>
+          {children}
+          <Toaster />
+        </Auth0Provider>
       </body>
     </html>
   )
