@@ -395,7 +395,7 @@ export default function LandingPage() {
           </div>
 
           {isMenuOpen && (
-            <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl">
+            <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto">
               <nav className="container mx-auto px-4 py-6 space-y-4">
                 {[
                   { name: t.nav.approach, href: "#approach" },
@@ -718,7 +718,7 @@ export default function LandingPage() {
                   href={client.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col items-center justify-center p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
+                  className="group flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
                 >
                   <div className="text-2xl lg:text-3xl font-bold text-slate-300 group-hover:text-white transition-colors duration-300 text-center">
                     {client.name}
@@ -860,10 +860,10 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-400 text-sm text-center md:text-left">
               © {year} Revosso. {t.footer.copyright}
             </p>
-            <div className="flex gap-4 text-slate-400 text-sm">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-slate-400 text-sm">
               <Link href="/privacy" className="hover:text-white transition-colors">
                 {t.footer.links.privacy}
               </Link>

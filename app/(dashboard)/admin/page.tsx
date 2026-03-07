@@ -427,6 +427,236 @@ function LeadRow({
   )
 }
 
+function LeadCard({
+  lead,
+  updatingId,
+  onUpdateStatus,
+  onOpenNotes,
+  onDeleteLead,
+}: {
+  lead: Lead
+  updatingId: string | null
+  onUpdateStatus: (id: string, status: LeadStatus) => void
+  onOpenNotes: (lead: Lead) => void
+  onDeleteLead: (lead: Lead) => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const status = (lead.leadStatus ?? "new") as LeadStatus
+  const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.new
+  const emailStatusCls =
+    EMAIL_STATUS_CONFIG[(lead.emailStatus as keyof typeof EMAIL_STATUS_CONFIG) ?? "pending"] ??
+    EMAIL_STATUS_CONFIG.pending
+
+  return (
+    <div className="border border-slate-800 rounded-lg bg-slate-900/60 p-4 space-y-3">
+      {/* Name / company + actions */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="font-medium text-white text-sm leading-snug">{lead.name}</p>
+          {lead.company && (
+            <p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">
+              <Building2 className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{lead.company}</span>
+            </p>
+          )}
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-slate-600 hover:text-slate-300 hover:bg-slate-800 flex-shrink-0"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Actions</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700 w-48">
+            <DropdownMenuItem
+              className="text-slate-300 hover:bg-slate-800 focus:bg-slate-800 focus:text-white text-xs cursor-pointer"
+              onClick={() => onOpenNotes(lead)}
+            >
+              <StickyNote className="h-3.5 w-3.5 mr-2 text-amber-400" />
+              {lead.notes ? "Edit Notes" : "Add Notes"}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-slate-300 hover:bg-slate-800 focus:bg-slate-800 focus:text-white text-xs cursor-pointer"
+              onClick={() => onUpdateStatus(lead.id, "contacted")}
+              disabled={status === "contacted" || updatingId === lead.id}
+            >
+              <MessageSquare className="h-3.5 w-3.5 mr-2 text-amber-400" />
+              Mark as Contacted
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-slate-300 hover:bg-slate-800 focus:bg-slate-800 focus:text-white text-xs cursor-pointer"
+              onClick={() => onUpdateStatus(lead.id, "converted")}
+              disabled={status === "converted" || updatingId === lead.id}
+            >
+              <UserCheck className="h-3.5 w-3.5 mr-2 text-emerald-400" />
+              Convert to Client
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-slate-800" />
+            <DropdownMenuItem
+              className="text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-400 text-xs cursor-pointer"
+              onClick={() => onDeleteLead(lead)}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-2" />
+              Delete Lead
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Email */}
+      <a
+        href={`mailto:${lead.email}`}
+        className="text-slate-300 hover:text-blue-400 transition-colors text-xs flex items-center gap-1.5"
+      >
+        <Mail className="h-3 w-3 flex-shrink-0" />
+        <span className="break-all">{lead.email}</span>
+      </a>
+
+      {/* Badges: interest + email status */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {lead.productInterest && (
+          <Badge variant="outline" className="border-slate-700 text-slate-400 text-xs font-normal">
+            {PRODUCT_LABELS[lead.productInterest] ?? lead.productInterest}
+          </Badge>
+        )}
+        <Badge variant="outline" className={`text-xs font-normal border ${emailStatusCls}`}>
+          {lead.emailStatus ?? "pending"}
+        </Badge>
+      </div>
+
+      {/* Date + status select + expand toggle */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-slate-500 text-xs flex items-center gap-1.5 whitespace-nowrap">
+          <Calendar className="h-3 w-3 flex-shrink-0" />
+          {formatDate(lead.createdAt)}
+        </span>
+        <div className="flex items-center gap-2">
+          <Select
+            value={status}
+            onValueChange={(val) => onUpdateStatus(lead.id, val as LeadStatus)}
+            disabled={updatingId === lead.id}
+          >
+            <SelectTrigger
+              className={`h-7 w-[110px] text-xs border ${statusCfg.className} bg-transparent focus:ring-0 focus:ring-offset-0 transition-colors`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-900 border-slate-700">
+              {Object.entries(STATUS_CONFIG).map(([value, cfg]) => (
+                <SelectItem
+                  key={value}
+                  value={value}
+                  className="text-slate-300 hover:bg-slate-800 text-xs focus:bg-slate-800 focus:text-white"
+                >
+                  {cfg.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="text-slate-500 hover:text-slate-300 transition-colors"
+            aria-label={expanded ? "Collapse" : "Expand"}
+          >
+            {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div className="pt-3 border-t border-slate-800 space-y-3">
+          {lead.message && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="h-3 w-3" />
+                Message
+              </p>
+              <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-wrap bg-slate-800/50 rounded-lg p-3 border border-slate-800">
+                {lead.message}
+              </p>
+            </div>
+          )}
+          {lead.notes && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-amber-500/80 uppercase tracking-wider flex items-center gap-1.5">
+                <StickyNote className="h-3 w-3" />
+                Follow-up Notes
+              </p>
+              <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-wrap bg-amber-500/5 rounded-lg p-3 border border-amber-500/20">
+                {lead.notes}
+              </p>
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs pt-1">
+            {lead.leadType && (
+              <>
+                <span className="text-slate-500">Lead type</span>
+                <span className="text-slate-300 text-right">{lead.leadType}</span>
+              </>
+            )}
+            {lead.sourcePage && (
+              <>
+                <span className="text-slate-500">Source</span>
+                <span className="text-slate-300 text-right">{lead.sourcePage}</span>
+              </>
+            )}
+            {lead.userLanguage && (
+              <>
+                <span className="text-slate-500 flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  Language
+                </span>
+                <span className="text-slate-300 text-right">{lead.userLanguage}</span>
+              </>
+            )}
+            <span className="text-slate-500">Lead ID</span>
+            <span className="text-slate-600 text-xs font-mono truncate text-right" title={lead.id}>
+              {lead.id.slice(0, 12)}…
+            </span>
+          </div>
+          <div className="space-y-1.5 pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-7 text-xs border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white justify-start gap-2"
+              onClick={() => onOpenNotes(lead)}
+            >
+              <StickyNote className="h-3 w-3 text-amber-400" />
+              {lead.notes ? "Edit Follow-up Notes" : "Add Follow-up Notes"}
+            </Button>
+            {status !== "converted" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full h-7 text-xs border-emerald-700/40 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 justify-start gap-2"
+                onClick={() => onUpdateStatus(lead.id, "converted")}
+                disabled={updatingId === lead.id}
+              >
+                <UserCheck className="h-3 w-3" />
+                Convert to Client
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-7 text-xs border-red-700/30 text-red-500 hover:bg-red-500/10 hover:text-red-400 justify-start gap-2"
+              onClick={() => onDeleteLead(lead)}
+            >
+              <Trash2 className="h-3 w-3" />
+              Delete Lead
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const getAccessToken = useAccessToken()
 
@@ -649,33 +879,49 @@ export default function AdminPage() {
               <p className="text-sm">No leads found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-slate-800 hover:bg-transparent">
-                    <TableHead className="text-slate-500 font-medium text-xs pl-9">Contact</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs">Email</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs">Interest</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs">Email Conf.</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs">Date</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs">Status</TableHead>
-                    <TableHead className="text-slate-500 font-medium text-xs w-10"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((lead) => (
-                    <LeadRow
-                      key={lead.id}
-                      lead={lead}
-                      updatingId={updatingId}
-                      onUpdateStatus={updateStatus}
-                      onOpenNotes={openNotesDialog}
-                      onDeleteLead={setDeleteTarget}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <>
+              {/* Mobile: card list */}
+              <div className="sm:hidden p-3 space-y-2">
+                {filtered.map((lead) => (
+                  <LeadCard
+                    key={lead.id}
+                    lead={lead}
+                    updatingId={updatingId}
+                    onUpdateStatus={updateStatus}
+                    onOpenNotes={openNotesDialog}
+                    onDeleteLead={setDeleteTarget}
+                  />
+                ))}
+              </div>
+              {/* Desktop: table */}
+              <div className="hidden sm:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-800 hover:bg-transparent">
+                      <TableHead className="text-slate-500 font-medium text-xs pl-9">Contact</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs">Email</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs">Interest</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs">Email Conf.</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs">Date</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs">Status</TableHead>
+                      <TableHead className="text-slate-500 font-medium text-xs w-10"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((lead) => (
+                      <LeadRow
+                        key={lead.id}
+                        lead={lead}
+                        updatingId={updatingId}
+                        onUpdateStatus={updateStatus}
+                        onOpenNotes={openNotesDialog}
+                        onDeleteLead={setDeleteTarget}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

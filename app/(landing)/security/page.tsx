@@ -538,8 +538,8 @@ export default function SecurityPage() {
 
       <footer className="bg-slate-950 border-t border-slate-800 py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-400 text-sm">© {year} Revosso. {t.allRightsReserved}</p>
-          <div className="flex gap-4 text-slate-400 text-sm">
+          <p className="text-slate-400 text-sm text-center md:text-left">© {year} Revosso. {t.allRightsReserved}</p>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-slate-400 text-sm">
             <Link href="/privacy" className="hover:text-white transition-colors">{t.footerPrivacy}</Link>
             <span>·</span>
             <Link href="/terms" className="hover:text-white transition-colors">{t.footerTerms}</Link>
