@@ -18,6 +18,16 @@ function getClientIP(request: NextRequest): string {
   return forwarded?.split(",")[0] || realIP || "unknown"
 }
 
+/**
+ * Extract the top-priority language from the Accept-Language header.
+ * e.g. "fr-FR,fr;q=0.9,en-US;q=0.8" → "fr-FR"
+ */
+function getAcceptLanguage(request: NextRequest): string | undefined {
+  const header = request.headers.get("accept-language")
+  if (!header) return undefined
+  return header.split(",")[0]?.split(";")[0]?.trim() || undefined
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -51,11 +61,17 @@ export async function POST(request: NextRequest) {
 
     // Capture request metadata
     const userAgent = request.headers.get("user-agent") || undefined
+    const acceptLanguage = getAcceptLanguage(request)
 
     // Call service layer to create lead
     // Service handles: database insert, emails, status updates
     const result = await leadsService.createLead({
-      data,
+      data: {
+        ...data,
+        // Fall back to the browser's Accept-Language header when the client
+        // did not explicitly send a userLanguage field
+        userLanguage: data.userLanguage || acceptLanguage,
+      },
       ipAddress: ip,
       userAgent,
     })
