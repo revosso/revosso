@@ -1,19 +1,24 @@
 import { auth0 } from './auth0';
 
 /**
- * Server-side authentication utilities
- * 
- * This application uses @auth0/nextjs-auth0 for authentication.
- * All /admin routes are protected by middleware (see middleware.ts).
- * 
- * Token Validation:
- * - Auth0 SDK automatically validates JWTs using JWKS (public keys)
- * - No client secret needed for validation
- * - Audience validation is built into the SDK
- * 
- * Session Management:
- * - Sessions stored in encrypted HTTP-only cookies
- * - Secure, SameSite=Lax for CSRF protection
+ * Server-side authentication utilities (nextjs-auth0 server SDK)
+ *
+ * IMPORTANT — ARCHITECTURAL GAP:
+ * The app's primary login flow uses the SPA SDK (`@auth0/auth0-spa-js`) via
+ * `components/auth0-provider.tsx`. That flow stores tokens in browser memory and
+ * never creates a server-side session cookie. As a result, `auth0.getSession()`
+ * will always return null in the current setup — meaning every function in this
+ * file that calls `requireAuth()` will throw "Unauthorized".
+ *
+ * To fix this properly, choose ONE of:
+ *  A) Switch the login flow to use the nextjs-auth0 server SDK end-to-end
+ *     (redirect to `/api/auth/login` instead of `loginWithRedirect()`).
+ *  B) Rewrite Server Actions to accept a Bearer token via `headers()` and
+ *     validate it with `validateJWT()` from `lib/jwt-validation.ts`.
+ *
+ * Until one of those changes is made, Server Actions that call `requireAuth()`
+ * are effectively unauthenticated. Do NOT add sensitive data mutations here
+ * without first resolving this gap.
  */
 
 /**

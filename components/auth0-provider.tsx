@@ -113,10 +113,17 @@ function getAuth0Client(): Auth0Client {
       authorizationParams: {
         redirect_uri: getRedirectUri(),
         audience: AUTH0_AUDIENCE,
-        scope: 'openid profile email',
+        // offline_access requests a refresh token from Auth0.
+        // Combined with useRefreshTokens + useRefreshTokensFallback this ensures
+        // the session survives page reloads without relying on third-party cookies
+        // (which Safari ITP and Firefox ETP block by default).
+        scope: 'openid profile email offline_access',
         ...(AUTH0_ORGANIZATION ? { organization: AUTH0_ORGANIZATION } : {}),
       },
       useRefreshTokens: true,
+      // Falls back to iframe silent auth only when no refresh token is cached.
+      // This is the safe default for SPAs that need reliable session persistence.
+      useRefreshTokensFallback: true,
       cacheLocation: 'memory',
     });
   }
@@ -198,7 +205,7 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
             authorizationParams: {
               redirect_uri: getRedirectUri(),
               audience: AUTH0_AUDIENCE,
-              scope: 'openid profile email',
+              scope: 'openid profile email offline_access',
               invitation: invitationParam,
               organization: organizationParam,
               // Explicitly force an interactive login screen — this is what
@@ -231,7 +238,13 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
           const result = await client.handleRedirectCallback();
           if (cancelled) return;
 
-          const returnTo: string = result?.appState?.returnTo ?? '/admin';
+          // Validate returnTo to prevent open-redirect attacks.
+          // Only allow relative paths (starts with '/' but not '//').
+          const raw: unknown = result?.appState?.returnTo;
+          const returnTo: string =
+            typeof raw === 'string' && raw.startsWith('/') && !raw.startsWith('//')
+              ? raw
+              : '/admin';
           routerRef.current.replace(returnTo);
           // Fall through — set auth state so the destination page renders
           // without another round-trip to check authentication.
@@ -256,17 +269,24 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
         console.warn('Auth0 initialization error:', error.message);
 
         // For user-facing auth rejections (not config mistakes), redirect to the
-        // landing page with a readable message instead of leaving the user stuck
-        // on a blank /callback page.
+        // landing page with a safe, generic message instead of exposing internal
+        // Auth0 error details in the URL (which get logged by proxies/CDNs/analytics).
         const isUserFacing =
           error.message.startsWith('access_denied') ||
           error.message.startsWith('unauthorized') ||
           error.message.includes('not part of the');
 
         if (isUserFacing && typeof window !== 'undefined') {
-          const description = error.message.replace(/^[^:]+:\s*/, ''); // strip "access_denied: "
+          // Map raw Auth0 codes to safe human-readable messages.
+          // Never put raw error descriptions in the URL.
+          let safeMessage = 'Sign-in failed. Please contact support if this continues.';
+          if (error.message.includes('not part of the')) {
+            safeMessage = 'Your account does not have access to this organization.';
+          } else if (error.message.startsWith('access_denied')) {
+            safeMessage = 'Access was denied. Please contact support.';
+          }
           window.location.replace(
-            `/?auth_error=${encodeURIComponent(description)}`
+            `/?auth_error=${encodeURIComponent(safeMessage)}`
           );
           return;
         }
@@ -286,13 +306,18 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
     try {
       const client = getAuth0Client();
       await client.loginWithRedirect({
+        // Spread caller options first so our security-critical params always win.
+        // Callers may add appState or prompt but cannot override audience/scope.
+        ...options,
         authorizationParams: {
+          // Merge caller's authorizationParams (e.g. invitation, prompt) on top
+          // of the base params, but our locked values overwrite any conflicts.
+          ...options?.authorizationParams,
           redirect_uri: getRedirectUri(),
           audience: AUTH0_AUDIENCE,
-          scope: 'openid profile email',
+          scope: 'openid profile email offline_access',
           ...(AUTH0_ORGANIZATION ? { organization: AUTH0_ORGANIZATION } : {}),
         },
-        ...options,
       });
     } catch (err) {
       const error = toError(err);
@@ -303,6 +328,10 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
 
   // Logout
   const logout = useCallback(async (returnTo?: string) => {
+    // Clear local state before navigating away. client.logout() triggers a
+    // browser navigation so the setState calls after it are never reached.
+    setIsAuthenticated(false);
+    setUser(null);
     try {
       const client = getAuth0Client();
       await client.logout({
@@ -310,11 +339,11 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
           returnTo: returnTo || window.location.origin,
         },
       });
-      setIsAuthenticated(false);
-      setUser(null);
     } catch (err) {
       console.error('Logout error:', err);
-      setError(err instanceof Error ? err : new Error('Logout failed'));
+      // State is already cleared. Force navigation as a fallback so the user
+      // is not left in a broken half-logged-in state.
+      window.location.assign(returnTo || window.location.origin);
     }
   }, []);
 
@@ -335,20 +364,25 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
       const token = await client.getTokenSilently({
         authorizationParams: {
           audience: AUTH0_AUDIENCE,
-          scope: 'openid profile email',
+          scope: 'openid profile email offline_access',
           ...(AUTH0_ORGANIZATION ? { organization: AUTH0_ORGANIZATION } : {}),
         },
       });
       return token;
     } catch (err) {
-      console.error('Error getting access token:', err);
-      // If token cannot be retrieved silently, user needs to re-authenticate
-      if (err instanceof Error && err.message.includes('login_required')) {
-        await loginWithRedirect();
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn('Error getting access token:', msg);
+
+      // When the session has expired, mark the user as unauthenticated and let
+      // ProtectedRoute trigger the re-login. Calling loginWithRedirect() directly
+      // here can cause redirect loops when getAccessToken is invoked during render.
+      if (msg.includes('login_required') || msg.includes('consent_required')) {
+        setIsAuthenticated(false);
+        setUser(null);
       }
       return undefined;
     }
-  }, [loginWithRedirect]);
+  }, []);
 
   const value: Auth0ContextType = {
     isLoading,

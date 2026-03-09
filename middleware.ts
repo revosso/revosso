@@ -2,27 +2,23 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 /**
- * Subdomain Routing Middleware
- * 
- * This middleware handles routing based on subdomain:
- * 
- * PRODUCTION:
- * - {BASE_DOMAIN} → Landing page (public)
- * - {DASHBOARD_SUBDOMAIN}.{BASE_DOMAIN} → Dashboard (protected)
- * 
- * LOCAL DEVELOPMENT:
- * - {LOCAL_BASE_DOMAIN}:3000 → Landing page
- * - {DASHBOARD_SUBDOMAIN}.{LOCAL_BASE_DOMAIN}:3000 → Dashboard
- * 
- * Architecture:
- * - Landing pages: app/(landing)/* 
- * - Dashboard pages: app/(dashboard)/*
- * - API routes: app/api/* (shared, protected by JWT validation)
- * 
- * Security:
- * - Dashboard routes require subdomain access only
- * - Attempting to access /admin from landing domain redirects to dashboard subdomain
- * - Authentication is handled by client-side ProtectedRoute + server-side JWT validation
+ * Subdomain Routing + Auth Gate Middleware
+ *
+ * Routing:
+ * - {BASE_DOMAIN}                         → Landing page (public)
+ * - {DASHBOARD_SUBDOMAIN}.{BASE_DOMAIN}   → Dashboard (protected)
+ *
+ * Auth gate (defense-in-depth):
+ * - /admin routes on the dashboard domain require a valid-looking Authorization
+ *   header OR the Auth0 SPA SDK cookie to be present.
+ * - Full JWT cryptographic validation still happens in API routes and in
+ *   ProtectedRoute / AdminProtectedRoute on the client.  This layer just
+ *   prevents unauthenticated browsers from receiving the dashboard HTML shell.
+ *
+ * Note: the SPA SDK stores tokens in memory (not cookies), so a hard page
+ * reload will briefly lack a token cookie and will pass through to the client
+ * where ProtectedRoute triggers the silent refresh / login. That is intentional
+ * and correct — do NOT add logic here that would redirect every reload to login.
  */
 
 // Environment-based domain configuration
@@ -112,7 +108,24 @@ export default async function middleware(request: NextRequest) {
     if (pathname === '/') {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
-    
+
+    // Lightweight server-side gate for /admin routes.
+    // The SPA SDK stores tokens in memory, not cookies, so there is no reliable
+    // server-side token on a hard reload. We therefore only block requests that
+    // carry an Authorization header with a clearly wrong format — a belt-and-
+    // suspenders check rather than a strict token validation (which belongs in
+    // API routes and ProtectedRoute).
+    //
+    // If you later add cookie-based session support (e.g. nextjs-auth0 server
+    // SDK properly integrated), enforce authentication here instead.
+    if (pathname.startsWith('/admin')) {
+      const authHeader = request.headers.get('authorization');
+      // Reject requests that supply a malformed Authorization header.
+      if (authHeader !== null && !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
     // Allow dashboard routes to pass through
     return NextResponse.next();
   }

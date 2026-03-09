@@ -85,7 +85,7 @@ function SidebarNav({
               <span className="text-xs text-slate-500 truncate">{user.name ?? user.email}</span>
             </div>
             <button
-              onClick={logout}
+              onClick={() => logout()}
               className="text-slate-600 hover:text-red-400 transition-colors p-1 rounded flex-shrink-0"
               title="Logout"
             >
@@ -109,7 +109,7 @@ function AdminShellInner({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex w-56 flex-col border-r border-slate-800 bg-slate-950 fixed top-0 left-0 h-full z-30">
         <SidebarNav
           pathname={pathname}
-          user={user}
+          user={user ?? undefined}
           logout={logout}
         />
       </aside>
@@ -131,7 +131,7 @@ function AdminShellInner({ children }: { children: React.ReactNode }) {
         <SidebarNav
           pathname={pathname}
           onLinkClick={() => setMobileOpen(false)}
-          user={user}
+          user={user ?? undefined}
           logout={logout}
         />
       </aside>

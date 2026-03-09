@@ -4,26 +4,36 @@ import { useEffect } from 'react';
 import { useAuth0 } from '@/components/auth0-provider';
 import { usePathname } from 'next/navigation';
 
-// Build the landing page origin from env or from the current host
-function getLandingOrigin(): string {
-  if (typeof window === 'undefined') return '/';
-  const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'revosso.com';
-  const localBase = process.env.NEXT_PUBLIC_LOCAL_BASE_DOMAIN || 'revosso.local';
-  const { hostname, port, protocol } = window.location;
-  const portSuffix = port ? `:${port}` : '';
 
-  if (hostname.includes(localBase)) {
-    return `${protocol}//${localBase}${portSuffix}`;
-  }
-  return `${protocol}//${baseDomain}`;
+function LoadingScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
+        <p className="text-slate-400 text-sm">Loading…</p>
+      </div>
+    </div>
+  );
 }
 
+function AuthErrorScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <div className="text-center max-w-md px-6">
+        <p className="text-red-400 text-sm font-medium mb-1">Authentication error</p>
+        <p className="text-slate-500 text-xs">
+          An error occurred during sign-in. Please try again or contact support.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
 /**
- * Protected Route Wrapper
- * 
  * Wraps components that require authentication.
  * Automatically redirects unauthenticated users to Auth0 login.
- * 
+ *
  * @example
  * export default function AdminPage() {
  *   return (
@@ -45,39 +55,17 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, isAuthenticated, error, loginWithRedirect, pathname]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-slate-400 text-sm">Loading…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="text-center max-w-md px-6">
-          <p className="text-red-400 text-sm font-medium mb-1">Authentication error</p>
-          <p className="text-slate-500 text-xs">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
+  if (isLoading) return <LoadingScreen />;
+  if (error) return <AuthErrorScreen />;
   if (!isAuthenticated) return null;
 
   return <>{children}</>;
 }
 
 /**
- * Protected Route Wrapper with Admin Role Check
- * 
- * Wraps components that require admin authentication.
- * Checks for admin role in user's token.
- * 
+ * Wraps components that require authentication.
+ * Audience validation on the JWT is the access control boundary.
+ *
  * @example
  * export default function AdminPage() {
  *   return (
@@ -92,35 +80,14 @@ export function AdminProtectedRoute({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    if (isLoading) return;
-    if (error) return;
+    if (isLoading || error) return;
     if (!isAuthenticated) {
       loginWithRedirect({ appState: { returnTo: pathname } });
     }
   }, [isLoading, isAuthenticated, error, loginWithRedirect, pathname]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-slate-400 text-sm">Loading…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <div className="text-center max-w-md px-6">
-          <p className="text-red-400 text-sm font-medium mb-1">Authentication error</p>
-          <p className="text-slate-500 text-xs">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
+  if (isLoading) return <LoadingScreen />;
+  if (error) return <AuthErrorScreen />;
   if (!isAuthenticated) return null;
 
   return <>{children}</>;
