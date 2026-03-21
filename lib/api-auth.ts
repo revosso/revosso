@@ -23,21 +23,22 @@ export type ProtectedAPIHandler = (
 
 function handleAuthError(error: unknown): Response {
   if (error instanceof Error) {
-    if (error.message.includes('missing')) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes('missing')) {
       return NextResponse.json(
         { error: 'Unauthorized - Authentication required' },
         { status: 401 }
       );
     }
-    if (error.message.includes('invalid') || error.message.includes('validation failed')) {
+    if (msg.includes('expired')) {
       return NextResponse.json(
-        { error: 'Unauthorized - Invalid token' },
+        { error: 'Unauthorized - Token expired' },
         { status: 401 }
       );
     }
-    if (error.message.includes('expired')) {
+    if (msg.includes('invalid') || msg.includes('validation failed')) {
       return NextResponse.json(
-        { error: 'Unauthorized - Token expired' },
+        { error: 'Unauthorized - Invalid token' },
         { status: 401 }
       );
     }

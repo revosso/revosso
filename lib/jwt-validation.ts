@@ -1,4 +1,4 @@
-import { jwtVerify, createRemoteJWKSet, type JWTPayload } from 'jose';
+import { jwtVerify, createRemoteJWKSet, errors, type JWTPayload } from 'jose';
 
 /**
  * JWT Validation using Auth0 JWKS (Public Keys)
@@ -60,6 +60,15 @@ export async function validateJWT(token: string): Promise<DecodedToken> {
     });
     return payload as DecodedToken;
   } catch (error) {
+    if (error instanceof errors.JWTExpired) {
+      throw new Error('Token expired');
+    }
+    if (error instanceof errors.JWTClaimValidationFailed) {
+      throw new Error(`Invalid token claims: ${error.message}`);
+    }
+    if (error instanceof errors.JWSSignatureVerificationFailed) {
+      throw new Error('Invalid token signature');
+    }
     throw new Error(
       `JWT validation failed: ${error instanceof Error ? error.message : String(error)}`
     );
