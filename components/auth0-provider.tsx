@@ -24,6 +24,9 @@ import { Auth0Client, type User, type RedirectLoginOptions } from '@auth0/auth0-
  * - Auth0 Universal Login (secure)
  */
 
+/** Optional flags for token acquisition (e.g. bypass cache after a 401 from our API). */
+export type GetAccessTokenOptions = { cacheMode?: 'on' | 'off' | 'cache-only' }
+
 interface Auth0ContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -31,7 +34,7 @@ interface Auth0ContextType {
   error: Error | null;
   loginWithRedirect: (options?: RedirectLoginOptions) => Promise<void>;
   logout: (returnTo?: string) => Promise<void>;
-  getAccessToken: () => Promise<string | undefined>;
+  getAccessToken: (options?: GetAccessTokenOptions) => Promise<string | undefined>;
 }
 
 const Auth0Context = createContext<Auth0ContextType | undefined>(undefined);
@@ -348,7 +351,7 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Get access token for API calls
-  const getAccessToken = useCallback(async (): Promise<string | undefined> => {
+  const getAccessToken = useCallback(async (options?: GetAccessTokenOptions): Promise<string | undefined> => {
     // Never attempt silent token acquisition during an invitation flow.
     // The user is not yet a member of the org, so prompt=none would be
     // rejected before initAuth0 has a chance to redirect them.
@@ -362,6 +365,7 @@ export function Auth0Provider({ children }: { children: React.ReactNode }) {
     try {
       const client = getAuth0Client();
       const token = await client.getTokenSilently({
+        cacheMode: options?.cacheMode ?? 'on',
         authorizationParams: {
           audience: AUTH0_AUDIENCE,
           scope: 'openid profile email offline_access',

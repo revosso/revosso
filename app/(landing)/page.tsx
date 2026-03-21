@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from "@/hooks/use-toast"
 import { translations, clients } from "@/lib/landing-data"
+import { resolveInitialLandingLocale } from "@/lib/landing-locale"
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -50,16 +51,13 @@ export default function LandingPage() {
   const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
 
   useEffect(() => {
-    const saved = localStorage.getItem("revosso-locale") as "en" | "fr" | "pt-BR" | "es" | null
-    if (saved && ["en", "fr", "pt-BR", "es"].includes(saved)) {
-      setLocale(saved)
-      return
+    let cancelled = false
+    resolveInitialLandingLocale().then((l) => {
+      if (!cancelled) setLocale(l)
+    })
+    return () => {
+      cancelled = true
     }
-    const browserLocale = navigator.language || "en"
-    if (browserLocale.startsWith("fr")) setLocale("fr")
-    else if (browserLocale.startsWith("pt")) setLocale("pt-BR")
-    else if (browserLocale.startsWith("es")) setLocale("es")
-    else setLocale("en")
   }, [])
 
   const handleLocaleChange = (newLocale: "en" | "fr" | "pt-BR" | "es") => {

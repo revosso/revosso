@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { resolveInitialLandingLocale } from "@/lib/landing-locale"
 import { Code, ArrowLeft } from "lucide-react"
 
 type Locale = "en" | "fr" | "pt-BR" | "es"
@@ -283,16 +284,13 @@ export default function PrivacyPage() {
   const [locale, setLocale] = useState<Locale>("en")
 
   useEffect(() => {
-    const saved = localStorage.getItem("revosso-locale") as Locale | null
-    if (saved && ["en", "fr", "pt-BR", "es"].includes(saved)) {
-      setLocale(saved)
-      return
+    let cancelled = false
+    resolveInitialLandingLocale().then((l) => {
+      if (!cancelled) setLocale(l as Locale)
+    })
+    return () => {
+      cancelled = true
     }
-    const l = navigator.language || "en"
-    if (l.startsWith("fr")) setLocale("fr")
-    else if (l.startsWith("pt")) setLocale("pt-BR")
-    else if (l.startsWith("es")) setLocale("es")
-    else setLocale("en")
   }, [])
 
   const t = data[locale]
