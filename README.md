@@ -192,9 +192,15 @@ NOTIFICATION_EMAIL=contact@revosso.com
 
 ```bash
 pnpm db:generate   # Generate Drizzle migration files
-pnpm db:migrate    # Apply migrations to Turso
+pnpm db:migrate    # Apply migrations to Turso (CLI; same as startup)
 pnpm db:push       # Push schema changes directly (development)
 ```
+
+**Production / `pnpm start`:** Migrations run automatically before `next start` via `scripts/db-migrate.mjs` (uses `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`, loads `.env` when present). After pointing the app at a new database, a normal start will create/upgrade tables from `./drizzle`.
+
+- To skip (e.g. you run migrations in CI only): set `SKIP_DB_MIGRATE_ON_START=1` or use `pnpm start:no-migrate`.
+- **Serverless (e.g. Vercel):** there is no long-lived `next start`; run `pnpm db:migrate` in the build command or a release step, or call the same script there, so each deployment applies pending migrations.
+- If a database was created with `db:push` instead of migrations, `migrate` can conflict with existing tables—prefer one workflow per environment (migrations for prod, or baseline `__drizzle_migrations` as in Drizzle docs).
 
 ---
 
