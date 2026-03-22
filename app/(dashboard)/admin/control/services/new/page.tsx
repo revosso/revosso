@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAccessToken } from "@/components/auth0-provider"
 import { authenticatedFetch } from "@/lib/authenticated-fetch"
+import { useControlMasterLists } from "@/hooks/use-control-master-lists"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,9 +27,14 @@ const STATUSES = [
   { value: "canceled", label: "Canceled" },
 ]
 
+const NONE = "0"
+
 export default function NewServicePage() {
   const getAccessToken = useAccessToken()
   const router = useRouter()
+  const { loading: listsLoading, categories, suppliers } = useControlMasterLists()
+  const [supplierId, setSupplierId] = useState(NONE)
+  const [categoryId, setCategoryId] = useState(NONE)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [form, setForm] = useState({
@@ -48,7 +54,11 @@ export default function NewServicePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name, vendor: form.vendor || null, category: form.category || null,
+          name: form.name,
+          supplierId: supplierId === NONE ? null : Number(supplierId),
+          categoryId: categoryId === NONE ? null : Number(categoryId),
+          vendor: supplierId === NONE ? (form.vendor || null) : null,
+          category: categoryId === NONE ? (form.category || null) : null,
           description: form.description || null, cost: Number(form.cost),
           currency: form.currency || "USD", billingCycle: form.billingCycle,
           billingDay: form.billingDay ? Number(form.billingDay) : null,
@@ -83,13 +93,70 @@ export default function NewServicePage() {
                 <Input value={form.name} onChange={(e) => set("name", e.target.value)} className="bg-slate-800 border-slate-700 text-white" required />
                 {errors.name && <p className="text-red-400 text-xs">{errors.name[0]}</p>}
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-slate-300">Vendor</Label>
-                <Input value={form.vendor} onChange={(e) => set("vendor", e.target.value)} className="bg-slate-800 border-slate-700 text-white" />
+              <div className="space-y-1.5 col-span-2">
+                <div className="flex justify-between gap-2">
+                  <Label className="text-slate-300">Supplier (fornecedor)</Label>
+                  <Link href="/admin/control/suppliers" className="text-xs text-orange-500 hover:text-orange-400">
+                    Manage
+                  </Link>
+                </div>
+                <Select value={supplierId} onValueChange={setSupplierId} disabled={listsLoading}>
+                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                    <SelectValue placeholder="From registry" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectItem value={NONE} className="text-slate-300">
+                      None (type vendor below)
+                    </SelectItem>
+                    {suppliers.map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)} className="text-white">
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-slate-300">Category</Label>
-                <Input value={form.category} onChange={(e) => set("category", e.target.value)} className="bg-slate-800 border-slate-700 text-white" />
+                <Label className="text-slate-300">Vendor (manual)</Label>
+                <Input
+                  value={form.vendor}
+                  onChange={(e) => set("vendor", e.target.value)}
+                  className="bg-slate-800 border-slate-700 text-white"
+                  disabled={supplierId !== NONE}
+                  placeholder={supplierId === NONE ? "Or pick supplier above" : "From registry"}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between gap-2">
+                  <Label className="text-slate-300">Category</Label>
+                  <Link href="/admin/control/categories" className="text-xs text-amber-500 hover:text-amber-400">
+                    Manage
+                  </Link>
+                </div>
+                <Select value={categoryId} onValueChange={setCategoryId} disabled={listsLoading}>
+                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                    <SelectValue placeholder="From registry" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectItem value={NONE} className="text-slate-300">
+                      None (type below)
+                    </SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)} className="text-white">
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-slate-300">Category (manual)</Label>
+                <Input
+                  value={form.category}
+                  onChange={(e) => set("category", e.target.value)}
+                  className="bg-slate-800 border-slate-700 text-white"
+                  disabled={categoryId !== NONE}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-slate-300">Cost *</Label>

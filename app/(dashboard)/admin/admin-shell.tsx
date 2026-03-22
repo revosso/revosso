@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   Code, LayoutDashboard, ExternalLink, LogOut, Menu, X,
-  FolderKanban, TrendingUp, TrendingDown, AlertTriangle, Layers, Globe, Settings,
+  FolderKanban, TrendingUp, TrendingDown, AlertTriangle, Layers, Globe, Tags, UserCircle, Truck, Settings,
 } from "lucide-react"
 import { AdminProtectedRoute } from "@/components/protected-route"
 import { useAuth0 } from "@/components/auth0-provider"
@@ -38,6 +38,9 @@ function SidebarNav({
     { href: "/admin/control/debts", label: t.navDebts, icon: AlertTriangle },
     { href: "/admin/control/services", label: t.navServices, icon: Layers },
     { href: "/admin/control/platforms", label: t.navPlatforms, icon: Globe },
+    { href: "/admin/control/categories", label: t.navCategories, icon: Tags },
+    { href: "/admin/control/clients", label: t.navClients, icon: UserCircle },
+    { href: "/admin/control/suppliers", label: t.navSuppliers, icon: Truck },
     { href: "/admin/control/settings", label: t.navSettings, icon: Settings },
   ]
 

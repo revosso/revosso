@@ -1,5 +1,5 @@
 import { controlDb } from "@/lib/control-db"
-import { expenses, projects, type Expense, type NewExpense } from "@/lib/control-schema"
+import { expenses, projects, suppliers, categories, type Expense, type NewExpense } from "@/lib/control-schema"
 import { eq, desc, sql } from "drizzle-orm"
 
 export class ExpensesRepository {
@@ -10,6 +10,8 @@ export class ExpensesRepository {
       .select({
         id: expenses.id,
         projectId: expenses.projectId,
+        supplierId: expenses.supplierId,
+        categoryId: expenses.categoryId,
         description: expenses.description,
         amount: expenses.amount,
         paidTo: expenses.paidTo,
@@ -18,16 +20,25 @@ export class ExpensesRepository {
         createdAt: expenses.createdAt,
         updatedAt: expenses.updatedAt,
         projectName: projects.name,
+        supplierName: suppliers.name,
+        categoryName: categories.name,
       })
       .from(expenses)
       .leftJoin(projects, eq(expenses.projectId, projects.id))
+      .leftJoin(suppliers, eq(expenses.supplierId, suppliers.id))
+      .leftJoin(categories, eq(expenses.categoryId, categories.id))
       .orderBy(desc(expenses.date))
       .limit(perPage)
       .offset(offset)
 
     const [{ count }] = await controlDb.select({ count: sql<number>`count(*)` }).from(expenses)
     return {
-      data: rows.map((r) => ({ ...r, projectName: r.projectName ?? null })),
+      data: rows.map((r) => ({
+        ...r,
+        projectName: r.projectName ?? null,
+        supplierName: r.supplierName ?? null,
+        categoryName: r.categoryName ?? null,
+      })),
       total: Number(count),
       page,
       perPage,
@@ -73,11 +84,13 @@ export class ExpensesRepository {
     return Number(total)
   }
 
-  async latest(limit = 10): Promise<(Expense & { projectName: string | null })[]> {
+  async latest(limit = 10): Promise<(Expense & { projectName: string | null; supplierName: string | null; categoryName: string | null })[]> {
     const rows = await controlDb
       .select({
         id: expenses.id,
         projectId: expenses.projectId,
+        supplierId: expenses.supplierId,
+        categoryId: expenses.categoryId,
         description: expenses.description,
         amount: expenses.amount,
         paidTo: expenses.paidTo,
@@ -86,12 +99,21 @@ export class ExpensesRepository {
         createdAt: expenses.createdAt,
         updatedAt: expenses.updatedAt,
         projectName: projects.name,
+        supplierName: suppliers.name,
+        categoryName: categories.name,
       })
       .from(expenses)
       .leftJoin(projects, eq(expenses.projectId, projects.id))
+      .leftJoin(suppliers, eq(expenses.supplierId, suppliers.id))
+      .leftJoin(categories, eq(expenses.categoryId, categories.id))
       .orderBy(desc(expenses.date))
       .limit(limit)
-    return rows.map((r) => ({ ...r, projectName: r.projectName ?? null }))
+    return rows.map((r) => ({
+      ...r,
+      projectName: r.projectName ?? null,
+      supplierName: r.supplierName ?? null,
+      categoryName: r.categoryName ?? null,
+    }))
   }
 }
 

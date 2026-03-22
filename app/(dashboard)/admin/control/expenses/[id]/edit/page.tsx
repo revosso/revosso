@@ -4,13 +4,17 @@ import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { useAccessToken } from "@/components/auth0-provider"
 import { authenticatedFetch } from "@/lib/authenticated-fetch"
+import { useControlMasterLists } from "@/hooks/use-control-master-lists"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, RefreshCw } from "lucide-react"
 import Link from "next/link"
+
+const NONE = "0"
 
 function toDateInput(d: string | null | undefined) {
   if (!d) return ""
@@ -21,12 +25,17 @@ export default function EditExpensePage({ params }: { params: Promise<{ id: stri
   const { id } = use(params)
   const getAccessToken = useAccessToken()
   const router = useRouter()
+  const { loading: listsLoading, categories, suppliers } = useControlMasterLists()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [form, setForm] = useState({ description: "", amount: "", paidTo: "", date: "", note: "" })
+  const [supplierId, setSupplierId] = useState(NONE)
+  const [categoryId, setCategoryId] = useState(NONE)
 
-  function set(k: keyof typeof form, v: string) { setForm((f) => ({ ...f, [k]: v })) }
+  function set(k: keyof typeof form, v: string) {
+    setForm((f) => ({ ...f, [k]: v }))
+  }
 
   useEffect(() => {
     async function load() {
@@ -38,6 +47,8 @@ export default function EditExpensePage({ params }: { params: Promise<{ id: stri
         date: toDateInput(e.date),
         note: e.note ?? "",
       })
+      setSupplierId(e.supplierId != null ? String(e.supplierId) : NONE)
+      setCategoryId(e.categoryId != null ? String(e.categoryId) : NONE)
       setLoading(false)
     }
     load()
@@ -45,6 +56,10 @@ export default function EditExpensePage({ params }: { params: Promise<{ id: stri
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (supplierId === NONE && !form.paidTo.trim()) {
+      setErrors({ paidTo: ["Select a supplier or type payee"] })
+      return
+    }
     setSaving(true)
     setErrors({})
     try {
@@ -54,58 +69,163 @@ export default function EditExpensePage({ params }: { params: Promise<{ id: stri
         body: JSON.stringify({
           description: form.description,
           amount: Number(form.amount),
-          paidTo: form.paidTo,
+          supplierId: supplierId === NONE ? null : Number(supplierId),
+          categoryId: categoryId === NONE ? null : Number(categoryId),
+          paidTo: supplierId === NONE ? form.paidTo.trim() : "",
           date: form.date,
           note: form.note || null,
         }),
         raw: true,
       })
       const body = await res.json().catch(() => ({}))
-      if (res.status === 422) { setErrors(body.errors?.fieldErrors ?? {}); return }
+      if (res.status === 422) {
+        setErrors(body.errors?.fieldErrors ?? {})
+        return
+      }
       if (!res.ok) throw new Error("Failed")
       router.push("/admin/control/expenses")
-    } catch { setErrors({ description: ["An unexpected error occurred."] }) } finally { setSaving(false) }
+    } catch {
+      setErrors({ description: ["An unexpected error occurred."] })
+    } finally {
+      setSaving(false)
+    }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><RefreshCw className="h-6 w-6 text-slate-500 animate-spin" /></div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <RefreshCw className="h-6 w-6 text-slate-500 animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 max-w-xl mx-auto space-y-5">
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" asChild className="text-slate-400">
-          <Link href="/admin/control/expenses"><ArrowLeft className="h-4 w-4 mr-1" />Back</Link>
+          <Link href="/admin/control/expenses">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back
+          </Link>
         </Button>
         <h1 className="text-xl font-bold text-white">Edit expense</h1>
       </div>
       <Card className="bg-slate-900 border-slate-800">
-        <CardHeader><CardTitle className="text-sm text-slate-300">Expense details</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-sm text-slate-300">Expense details</CardTitle>
+        </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-slate-300">Description *</Label>
-              <Input value={form.description} onChange={(e) => set("description", e.target.value)} className="bg-slate-800 border-slate-700 text-white" required />
+              <Input
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                className="bg-slate-800 border-slate-700 text-white"
+                required
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-slate-300">Amount *</Label>
-                <Input type="number" min="0" step="0.01" value={form.amount} onChange={(e) => set("amount", e.target.value)} className="bg-slate-800 border-slate-700 text-white" required />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.amount}
+                  onChange={(e) => set("amount", e.target.value)}
+                  className="bg-slate-800 border-slate-700 text-white"
+                  required
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-slate-300">Date *</Label>
-                <Input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} className="bg-slate-800 border-slate-700 text-white" required />
+                <Input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => set("date", e.target.value)}
+                  className="bg-slate-800 border-slate-700 text-white"
+                  required
+                />
               </div>
             </div>
+
             <div className="space-y-1.5">
-              <Label className="text-slate-300">Paid to *</Label>
-              <Input value={form.paidTo} onChange={(e) => set("paidTo", e.target.value)} className="bg-slate-800 border-slate-700 text-white" required />
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-slate-300">Supplier (fornecedor)</Label>
+                <Link href="/admin/control/suppliers" className="text-xs text-orange-500 hover:text-orange-400">
+                  Manage suppliers
+                </Link>
+              </div>
+              <Select value={supplierId} onValueChange={setSupplierId} disabled={listsLoading}>
+                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                  <SelectValue placeholder="Choose supplier" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value={NONE} className="text-slate-300">
+                    None (type manually below)
+                  </SelectItem>
+                  {suppliers.map((s) => (
+                    <SelectItem key={s.id} value={String(s.id)} className="text-white">
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-slate-300">Paid to {supplierId === NONE ? "*" : ""}</Label>
+              <Input
+                value={form.paidTo}
+                onChange={(e) => set("paidTo", e.target.value)}
+                className="bg-slate-800 border-slate-700 text-white"
+                disabled={supplierId !== NONE}
+                required={supplierId === NONE}
+              />
+              {errors.paidTo && <p className="text-red-400 text-xs">{errors.paidTo[0]}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-slate-300">Category</Label>
+                <Link href="/admin/control/categories" className="text-xs text-amber-500 hover:text-amber-400">
+                  Manage categories
+                </Link>
+              </div>
+              <Select value={categoryId} onValueChange={setCategoryId} disabled={listsLoading}>
+                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                  <SelectValue placeholder="Optional" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value={NONE} className="text-slate-300">
+                    None
+                  </SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)} className="text-white">
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-1.5">
               <Label className="text-slate-300">Note</Label>
-              <Textarea value={form.note} onChange={(e) => set("note", e.target.value)} className="bg-slate-800 border-slate-700 text-white" rows={2} />
+              <Textarea
+                value={form.note}
+                onChange={(e) => set("note", e.target.value)}
+                className="bg-slate-800 border-slate-700 text-white"
+                rows={2}
+              />
             </div>
             <div className="flex gap-3 pt-2">
-              <Button type="submit" disabled={saving} className="bg-red-700 hover:bg-red-800 text-white">{saving ? "Saving…" : "Save changes"}</Button>
-              <Button type="button" variant="ghost" asChild className="text-slate-400"><Link href="/admin/control/expenses">Cancel</Link></Button>
+              <Button type="submit" disabled={saving} className="bg-red-700 hover:bg-red-800 text-white">
+                {saving ? "Saving…" : "Save changes"}
+              </Button>
+              <Button type="button" variant="ghost" asChild className="text-slate-400">
+                <Link href="/admin/control/expenses">Cancel</Link>
+              </Button>
             </div>
           </form>
         </CardContent>

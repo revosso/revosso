@@ -1,10 +1,13 @@
 import { withAdminAuth } from "@/lib/api-auth"
 import { contractedService } from "@/lib/services/control-contracted"
+import { resolveServiceVendorCategory } from "@/lib/control-transaction-resolve"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 const schema = z.object({
   name: z.string().min(1).max(255),
+  supplierId: z.union([z.coerce.number().int().positive(), z.null()]).optional(),
+  categoryId: z.union([z.coerce.number().int().positive(), z.null()]).optional(),
   vendor: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
@@ -31,10 +34,25 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ errors: parsed.error.flatten() }, { status: 422 })
   const d = parsed.data
+  const resolved = await resolveServiceVendorCategory({
+    supplierId: d.supplierId ?? null,
+    categoryId: d.categoryId ?? null,
+    vendor: d.vendor,
+    category: d.category,
+  })
+  if (!resolved.ok) {
+    const field = resolved.code === "invalid_supplier" ? "supplierId" : "categoryId"
+    return NextResponse.json(
+      { errors: { fieldErrors: { [field]: ["Invalid reference"] } } },
+      { status: 422 },
+    )
+  }
   const service = await contractedService.create({
     name: d.name,
-    vendor: d.vendor ?? null,
-    category: d.category ?? null,
+    supplierId: resolved.supplierId,
+    categoryId: resolved.categoryId,
+    vendor: resolved.vendor,
+    category: resolved.category,
     description: d.description ?? null,
     cost: d.cost,
     currency: d.currency ?? "USD",

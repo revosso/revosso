@@ -15,6 +15,9 @@ export type AdminStrings = {
   navDebts: string
   navServices: string
   navPlatforms: string
+  navCategories: string
+  navClients: string
+  navSuppliers: string
   navSettings: string
   sectionCrm: string
   sectionControl: string
@@ -46,6 +49,9 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     navDebts: "Debts",
     navServices: "Services",
     navPlatforms: "Platforms",
+    navCategories: "Categories",
+    navClients: "Clients",
+    navSuppliers: "Suppliers",
     navSettings: "Settings",
     sectionCrm: "CRM",
     sectionControl: "Control",
@@ -76,6 +82,9 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     navDebts: "Dettes",
     navServices: "Services",
     navPlatforms: "Plateformes",
+    navCategories: "Catégories",
+    navClients: "Clients",
+    navSuppliers: "Fournisseurs",
     navSettings: "Paramètres",
     sectionCrm: "CRM",
     sectionControl: "Pilotage",
@@ -106,6 +115,9 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     navDebts: "Dívidas",
     navServices: "Serviços",
     navPlatforms: "Plataformas",
+    navCategories: "Categorias",
+    navClients: "Clientes",
+    navSuppliers: "Fornecedores",
     navSettings: "Configurações",
     sectionCrm: "CRM",
     sectionControl: "Controle",
