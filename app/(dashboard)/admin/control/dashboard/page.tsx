@@ -16,6 +16,7 @@ import {
   ArrowDownRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { AdminEnterpriseIdentity } from "@/components/admin-enterprise-identity"
 
 type DashboardData = {
   balance: number
@@ -103,6 +104,8 @@ export default function ControlDashboard() {
           <RefreshCw className="h-4 w-4 mr-1.5" />Refresh
         </Button>
       </div>
+
+      <AdminEnterpriseIdentity variant="banner" />
 
       {/* ── Financial summary cards ─────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -11,6 +11,7 @@ import { AdminProtectedRoute } from "@/components/protected-route"
 import { useAuth0 } from "@/components/auth0-provider"
 import { AdminLocaleProvider, useAdminLocale } from "@/components/admin-locale-context"
 import { Button } from "@/components/ui/button"
+import { AdminEnterpriseIdentity } from "@/components/admin-enterprise-identity"
 
 function SidebarNav({
   pathname,
@@ -99,8 +100,10 @@ function SidebarNav({
         ))}
       </nav>
 
-      {/* Footer: back to site + user info */}
-      <div className="border-t border-slate-800 px-3 py-3 space-y-1 flex-shrink-0">
+      {/* Footer: legal entity + back to site + user */}
+      <div className="border-t border-slate-800 pt-2 pb-3 flex-shrink-0 space-y-1">
+        <AdminEnterpriseIdentity variant="sidebar" />
+        <div className="px-3 space-y-1">
         <a
           href={landingUrl}
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/30 text-xs transition-colors"
@@ -130,6 +133,7 @@ function SidebarNav({
             </button>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

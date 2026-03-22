@@ -28,6 +28,12 @@ export type AdminStrings = {
   settingsSave: string
   settingsSaving: string
   settingsSaved: string
+  enterpriseIdentityLabel: string
+  enterpriseIdentityAria: string
+  enterpriseCopyCnpj: string
+  enterpriseCopyDigits: string
+  enterpriseCopyFull: string
+  enterpriseCopied: string
 }
 
 export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
@@ -54,6 +60,12 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     settingsSave: "Save settings",
     settingsSaving: "Saving…",
     settingsSaved: "Saved",
+    enterpriseIdentityLabel: "Legal entity",
+    enterpriseIdentityAria: "Company legal name and tax ID",
+    enterpriseCopyCnpj: "Copy CNPJ",
+    enterpriseCopyDigits: "Digits only",
+    enterpriseCopyFull: "Full line",
+    enterpriseCopied: "Copied!",
   },
   fr: {
     navLeads: "Prospects",
@@ -78,6 +90,12 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     settingsSave: "Enregistrer",
     settingsSaving: "Enregistrement…",
     settingsSaved: "Enregistré",
+    enterpriseIdentityLabel: "Personne morale",
+    enterpriseIdentityAria: "Raison sociale et identifiant fiscal",
+    enterpriseCopyCnpj: "Copier CNPJ",
+    enterpriseCopyDigits: "Chiffres seuls",
+    enterpriseCopyFull: "Ligne complète",
+    enterpriseCopied: "Copié !",
   },
   pt: {
     navLeads: "Leads",
@@ -102,5 +120,11 @@ export const adminTranslations: Record<AdminLocaleCode, AdminStrings> = {
     settingsSave: "Salvar configurações",
     settingsSaving: "Salvando…",
     settingsSaved: "Salvo",
+    enterpriseIdentityLabel: "Empresa",
+    enterpriseIdentityAria: "Razão social e CNPJ",
+    enterpriseCopyCnpj: "Copiar CNPJ",
+    enterpriseCopyDigits: "Só números",
+    enterpriseCopyFull: "Linha completa",
+    enterpriseCopied: "Copiado!",
   },
 }
