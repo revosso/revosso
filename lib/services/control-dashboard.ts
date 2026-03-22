@@ -3,7 +3,21 @@ import { expensesRepository } from "@/lib/repositories/control-expenses"
 import { projectsRepository } from "@/lib/repositories/control-projects"
 import { debtsRepository } from "@/lib/repositories/control-debts"
 import { servicesRepository } from "@/lib/repositories/control-services"
-import { serviceMonthlyCost, type BillingCycle, type Service } from "@/lib/control-schema"
+import { serviceMonthlyCost, type BillingCycle, type Service, type Project } from "@/lib/control-schema"
+
+/** Slim project row for dashboard decisions (lists + links). */
+function toProjectDecisionRow(p: Project) {
+  return {
+    id: p.id,
+    name: p.name,
+    status: p.status,
+    expectedEndDate: p.expectedEndDate ?? null,
+    lastUpdateAt: p.lastUpdateAt ?? null,
+    progressPercent: p.progressPercent ?? null,
+    priority: p.priority ?? null,
+    budget: p.budget ?? null,
+  }
+}
 
 function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1)
@@ -43,21 +57,47 @@ async function getLastMonthTotals() {
   return { last_month_income: income, last_month_expense: expense, last_month_net: income - expense }
 }
 
+async function getYearToDateTotals() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 1)
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+  const [income, expense] = await Promise.all([
+    incomesRepository.sumBetween(start, end),
+    expensesRepository.sumBetween(start, end),
+  ])
+  return { ytd_income: income, ytd_expense: expense, ytd_net: income - expense }
+}
+
 async function getProjectSummary() {
-  const [byStatus, atRiskProjects] = await Promise.all([
+  const [
+    byStatus,
+    atRiskProjects,
+    delayedList,
+    scheduleOverdueList,
+    delayedCount,
+    scheduleOverdueCount,
+  ] = await Promise.all([
     projectsRepository.countByStatus(),
-    projectsRepository.findAtRisk(5),
+    projectsRepository.findAtRisk(8),
+    projectsRepository.findDelayed(15),
+    projectsRepository.findScheduleOverdue(15),
+    projectsRepository.countDelayed(),
+    projectsRepository.countScheduleOverdue(),
   ])
   const total = Object.values(byStatus).reduce((a, b) => a + b, 0)
   return {
     total,
+    delayed_count: delayedCount,
+    schedule_overdue_count: scheduleOverdueCount,
     by_status: {
       stopped: byStatus["stopped"] ?? 0,
       in_progress: byStatus["in_progress"] ?? 0,
       delayed: byStatus["delayed"] ?? 0,
       completed: byStatus["completed"] ?? 0,
     },
-    at_risk_projects: atRiskProjects,
+    at_risk_projects: atRiskProjects.map(toProjectDecisionRow),
+    delayed_projects: delayedList.map(toProjectDecisionRow),
+    schedule_overdue_projects: scheduleOverdueList.map(toProjectDecisionRow),
   }
 }
 
@@ -156,17 +196,27 @@ async function getLatestTransactions(limit = 10) {
 export const dashboardService = {
   /** Full admin dashboard — mirrors DashboardService::getDashboardData() */
   async getDashboardData() {
-    const [financial, monthly, lastMonth, projects, debts, services, latestTransactions, latestUpdates] =
-      await Promise.all([
-        getFinancialSummary(),
-        getMonthlyTotals(),
-        getLastMonthTotals(),
-        getProjectSummary(),
-        getDebtsSummary(),
-        getServicesSummary(),
-        getLatestTransactions(10),
-        projectsRepository.getLatestUpdates(10),
-      ])
+    const [
+      financial,
+      monthly,
+      lastMonth,
+      ytd,
+      projects,
+      debts,
+      services,
+      latestTransactions,
+      latestUpdates,
+    ] = await Promise.all([
+      getFinancialSummary(),
+      getMonthlyTotals(),
+      getLastMonthTotals(),
+      getYearToDateTotals(),
+      getProjectSummary(),
+      getDebtsSummary(),
+      getServicesSummary(),
+      getLatestTransactions(10),
+      projectsRepository.getLatestUpdates(10),
+    ])
     return {
       balance: financial.balance,
       total_income: financial.total_income,
@@ -177,6 +227,9 @@ export const dashboardService = {
       last_month_income: lastMonth.last_month_income,
       last_month_expense: lastMonth.last_month_expense,
       last_month_net: lastMonth.last_month_net,
+      ytd_income: ytd.ytd_income,
+      ytd_expense: ytd.ytd_expense,
+      ytd_net: ytd.ytd_net,
       projects,
       debts,
       services,
