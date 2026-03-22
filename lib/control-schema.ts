@@ -94,6 +94,18 @@ export const services = sqliteTable("control_services", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 })
 
+// ─── Platforms (enterprise tools / URLs registry) ─────────────────────────────
+export const platforms = sqliteTable("control_platforms", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
+  category: text("category"),
+  notes: text("notes"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+})
+
 // ─── Settings ────────────────────────────────────────────────────────────────
 export const settings = sqliteTable("control_settings", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -116,6 +128,8 @@ export type Debt = typeof debts.$inferSelect
 export type NewDebt = typeof debts.$inferInsert
 export type Service = typeof services.$inferSelect
 export type NewService = typeof services.$inferInsert
+export type Platform = typeof platforms.$inferSelect
+export type NewPlatform = typeof platforms.$inferInsert
 export type Setting = typeof settings.$inferSelect
 
 // ─── Domain constants (mirror Laravel model constants) ────────────────────────
