@@ -8,7 +8,7 @@ import {
   type NewProject,
   type ProjectUpdate,
 } from "@/lib/control-schema"
-import { eq, ne, or, isNull, lte, and, desc, sql } from "drizzle-orm"
+import { eq, ne, or, isNull, isNotNull, lte, and, desc, asc, sql } from "drizzle-orm"
 
 export class ProjectsRepository {
   /** All projects ordered by updatedAt desc, paginated 15 — mirrors ProjectController::index() */
@@ -72,6 +72,60 @@ export class ProjectsRepository {
       .from(projects)
       .groupBy(projects.status)
     return Object.fromEntries(rows.map((r) => [r.status, Number(r.count)]))
+  }
+
+  /** Explicitly marked delayed (status = delayed). */
+  async findDelayed(limit = 25): Promise<Project[]> {
+    return controlDb
+      .select()
+      .from(projects)
+      .where(eq(projects.status, "delayed"))
+      .orderBy(desc(projects.updatedAt))
+      .limit(limit)
+  }
+
+  /**
+   * Not completed, has expected end date, and that date is before today (schedule slip).
+   */
+  async findScheduleOverdue(limit = 25): Promise<Project[]> {
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    return controlDb
+      .select()
+      .from(projects)
+      .where(
+        and(
+          ne(projects.status, "completed"),
+          isNotNull(projects.expectedEndDate),
+          lte(projects.expectedEndDate, startOfToday),
+        ),
+      )
+      .orderBy(asc(projects.expectedEndDate))
+      .limit(limit)
+  }
+
+  async countDelayed(): Promise<number> {
+    const [{ c }] = await controlDb
+      .select({ c: sql<number>`count(*)` })
+      .from(projects)
+      .where(eq(projects.status, "delayed"))
+    return Number(c)
+  }
+
+  async countScheduleOverdue(): Promise<number> {
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    const [{ c }] = await controlDb
+      .select({ c: sql<number>`count(*)` })
+      .from(projects)
+      .where(
+        and(
+          ne(projects.status, "completed"),
+          isNotNull(projects.expectedEndDate),
+          lte(projects.expectedEndDate, startOfToday),
+        ),
+      )
+    return Number(c)
   }
 
   async totalIncomesForProject(projectId: number): Promise<number> {

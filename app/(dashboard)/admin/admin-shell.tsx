@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  Code, LayoutDashboard, ExternalLink, LogOut, Menu, X,
+  Code, LayoutDashboard, ExternalLink, LogOut, Menu, X, Users,
   FolderKanban, TrendingUp, TrendingDown, AlertTriangle, Layers, Globe, Tags, UserCircle, Truck, Settings,
 } from "lucide-react"
 import { AdminProtectedRoute } from "@/components/protected-route"
@@ -26,12 +26,13 @@ function SidebarNav({
 }) {
   const { t } = useAdminLocale()
 
+  const dashboardLink = { href: "/admin/control/dashboard", label: t.navDashboard }
+
   const navLinks = [
-    { href: "/admin", label: t.navLeads, icon: LayoutDashboard },
+    { href: "/admin", label: t.navLeads, icon: Users },
   ]
 
   const controlNav = [
-    { href: "/admin/control/dashboard", label: t.navDashboard, icon: LayoutDashboard },
     { href: "/admin/control/projects", label: t.navProjects, icon: FolderKanban },
     { href: "/admin/control/incomes", label: t.navIncomes, icon: TrendingUp },
     { href: "/admin/control/expenses", label: t.navExpenses, icon: TrendingDown },
@@ -66,8 +67,22 @@ function SidebarNav({
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {/* Dashboard first (Control overview) */}
+        <Link
+          href={dashboardLink.href}
+          onClick={onLinkClick}
+          className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+            pathname === dashboardLink.href || pathname.startsWith(dashboardLink.href + "/")
+              ? "bg-slate-800 text-white"
+              : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+          }`}
+        >
+          <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+          {dashboardLink.label}
+        </Link>
+
         {/* CRM section */}
-        <p className="px-3 py-1 text-xs font-semibold text-slate-600 uppercase tracking-wider">{t.sectionCrm}</p>
+        <p className="px-3 pt-3 pb-1 text-xs font-semibold text-slate-600 uppercase tracking-wider">{t.sectionCrm}</p>
         {navLinks.map(({ href, icon: Icon, label }) => (
           <Link
             key={href}
