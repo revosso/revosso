@@ -1,5 +1,5 @@
 import { controlDb } from "@/lib/control-db"
-import { incomes, projects, type Income, type NewIncome } from "@/lib/control-schema"
+import { incomes, projects, clients, categories, type Income, type NewIncome } from "@/lib/control-schema"
 import { eq, desc, sql } from "drizzle-orm"
 
 export class IncomesRepository {
@@ -10,6 +10,8 @@ export class IncomesRepository {
       .select({
         id: incomes.id,
         projectId: incomes.projectId,
+        clientId: incomes.clientId,
+        categoryId: incomes.categoryId,
         description: incomes.description,
         amount: incomes.amount,
         receivedFrom: incomes.receivedFrom,
@@ -18,16 +20,25 @@ export class IncomesRepository {
         createdAt: incomes.createdAt,
         updatedAt: incomes.updatedAt,
         projectName: projects.name,
+        clientName: clients.name,
+        categoryName: categories.name,
       })
       .from(incomes)
       .leftJoin(projects, eq(incomes.projectId, projects.id))
+      .leftJoin(clients, eq(incomes.clientId, clients.id))
+      .leftJoin(categories, eq(incomes.categoryId, categories.id))
       .orderBy(desc(incomes.date))
       .limit(perPage)
       .offset(offset)
 
     const [{ count }] = await controlDb.select({ count: sql<number>`count(*)` }).from(incomes)
     return {
-      data: rows.map((r) => ({ ...r, projectName: r.projectName ?? null })),
+      data: rows.map((r) => ({
+        ...r,
+        projectName: r.projectName ?? null,
+        clientName: r.clientName ?? null,
+        categoryName: r.categoryName ?? null,
+      })),
       total: Number(count),
       page,
       perPage,
@@ -76,11 +87,13 @@ export class IncomesRepository {
   }
 
   /** Latest N incomes for transaction feed */
-  async latest(limit = 10): Promise<(Income & { projectName: string | null })[]> {
+  async latest(limit = 10): Promise<(Income & { projectName: string | null; clientName: string | null; categoryName: string | null })[]> {
     const rows = await controlDb
       .select({
         id: incomes.id,
         projectId: incomes.projectId,
+        clientId: incomes.clientId,
+        categoryId: incomes.categoryId,
         description: incomes.description,
         amount: incomes.amount,
         receivedFrom: incomes.receivedFrom,
@@ -89,12 +102,21 @@ export class IncomesRepository {
         createdAt: incomes.createdAt,
         updatedAt: incomes.updatedAt,
         projectName: projects.name,
+        clientName: clients.name,
+        categoryName: categories.name,
       })
       .from(incomes)
       .leftJoin(projects, eq(incomes.projectId, projects.id))
+      .leftJoin(clients, eq(incomes.clientId, clients.id))
+      .leftJoin(categories, eq(incomes.categoryId, categories.id))
       .orderBy(desc(incomes.date))
       .limit(limit)
-    return rows.map((r) => ({ ...r, projectName: r.projectName ?? null }))
+    return rows.map((r) => ({
+      ...r,
+      projectName: r.projectName ?? null,
+      clientName: r.clientName ?? null,
+      categoryName: r.categoryName ?? null,
+    }))
   }
 }
 

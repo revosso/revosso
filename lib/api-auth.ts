@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { validateAPIRequestToken, type DecodedToken } from '@/lib/jwt-validation';
 
 /**
@@ -15,8 +15,8 @@ import { validateAPIRequestToken, type DecodedToken } from '@/lib/jwt-validation
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ProtectedAPIHandler = (
-  request: Request,
-  context: { params?: any },
+  request: NextRequest,
+  context: any,
   user: DecodedToken
 ) => Promise<Response> | Response;
 
@@ -56,7 +56,7 @@ function handleAuthError(error: unknown): Response {
  */
 export function withAuth(handler: ProtectedAPIHandler) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return async (request: Request, context: { params?: any } = {}) => {
+  return async (request: NextRequest, context: any = {}) => {
     try {
       const user = await validateAPIRequestToken(request);
       return await handler(request, context, user);
@@ -82,7 +82,7 @@ export const withAdminAuth = withAuth;
  * Optionally extract the authenticated user from a request.
  * Returns null instead of throwing when no valid token is present.
  */
-export async function getUser(request: Request): Promise<DecodedToken | null> {
+export async function getUser(request: Request | NextRequest): Promise<DecodedToken | null> {
   try {
     return await validateAPIRequestToken(request);
   } catch {

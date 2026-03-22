@@ -28,10 +28,40 @@ export const projectUpdates = sqliteTable("control_project_updates", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 })
 
+// ─── Master data: categories, clients (customers), suppliers (fornecedores) ───
+export const categories = sqliteTable("control_categories", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull().unique(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+})
+
+export const clients = sqliteTable("control_clients", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  notes: text("notes"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+})
+
+export const suppliers = sqliteTable("control_suppliers", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  notes: text("notes"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+})
+
 // ─── Incomes ─────────────────────────────────────────────────────────────────
 export const incomes = sqliteTable("control_incomes", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   projectId: integer("project_id").references(() => projects.id),
+  clientId: integer("client_id").references(() => clients.id),
+  categoryId: integer("category_id").references(() => categories.id),
   description: text("description").notNull(),
   amount: real("amount").notNull(),
   receivedFrom: text("received_from").notNull(),
@@ -45,6 +75,8 @@ export const incomes = sqliteTable("control_incomes", {
 export const expenses = sqliteTable("control_expenses", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   projectId: integer("project_id").references(() => projects.id),
+  supplierId: integer("supplier_id").references(() => suppliers.id),
+  categoryId: integer("category_id").references(() => categories.id),
   description: text("description").notNull(),
   amount: real("amount").notNull(),
   paidTo: text("paid_to").notNull(),
@@ -78,6 +110,8 @@ export const debts = sqliteTable("control_debts", {
 export const services = sqliteTable("control_services", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
+  supplierId: integer("supplier_id").references(() => suppliers.id),
+  categoryId: integer("category_id").references(() => categories.id),
   vendor: text("vendor"),
   category: text("category"),
   description: text("description"),
@@ -120,6 +154,12 @@ export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
 export type ProjectUpdate = typeof projectUpdates.$inferSelect
 export type NewProjectUpdate = typeof projectUpdates.$inferInsert
+export type Category = typeof categories.$inferSelect
+export type NewCategory = typeof categories.$inferInsert
+export type Client = typeof clients.$inferSelect
+export type NewClient = typeof clients.$inferInsert
+export type Supplier = typeof suppliers.$inferSelect
+export type NewSupplier = typeof suppliers.$inferInsert
 export type Income = typeof incomes.$inferSelect
 export type NewIncome = typeof incomes.$inferInsert
 export type Expense = typeof expenses.$inferSelect
