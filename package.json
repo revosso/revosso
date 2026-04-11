@@ -19,7 +19,11 @@
     "db:push": "drizzle-kit push",
     "setup": "./setup-local-dev.sh",
     "dev:landing": "echo 'Opening landing page...' && open http://revosso.local:3000 2>/dev/null || xdg-open http://revosso.local:3000 2>/dev/null || echo 'Visit http://revosso.local:3000'",
-    "dev:dashboard": "echo 'Opening dashboard (HTTPS)...' && open https://localhost:3000/admin 2>/dev/null || xdg-open https://localhost:3000/admin 2>/dev/null || echo 'Visit https://localhost:3000/admin'"
+    "dev:dashboard": "echo 'Opening dashboard (HTTPS)...' && open https://localhost:3000/admin 2>/dev/null || xdg-open https://localhost:3000/admin 2>/dev/null || echo 'Visit https://localhost:3000/admin'",
+    "docker:build": "docker build -t revosso:latest .",
+    "docker:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
+    "docker:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d"
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.17.0",

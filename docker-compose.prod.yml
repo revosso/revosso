@@ -1,0 +1,18 @@
+# Production: built image, no bind mounts, restart policy
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+# Prefer setting secrets in .env.production (not committed) or your platform's secret store.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    image: ${DOCKER_IMAGE:-revosso:latest}
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
