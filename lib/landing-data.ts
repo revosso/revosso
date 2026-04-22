@@ -1,6 +1,7 @@
 export const translations = {
   en: {
     nav: {
+      products: "Products",
       approach: "Approach",
       services: "Services",
       industries: "Solutions",
@@ -175,6 +176,7 @@ export const translations = {
   },
   fr: {
     nav: {
+      products: "Produits",
       approach: "Approche",
       services: "Services",
       industries: "Solutions",
@@ -349,6 +351,7 @@ export const translations = {
   },
   "pt-BR": {
     nav: {
+      products: "Produtos",
       approach: "Abordagem",
       services: "Serviços",
       industries: "Soluções",
@@ -523,6 +526,7 @@ export const translations = {
   },
   es: {
     nav: {
+      products: "Productos",
       approach: "Enfoque",
       services: "Servicios",
       industries: "Soluciones",

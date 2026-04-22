@@ -2,7 +2,8 @@
 
 import type React from "react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import Image from "next/image"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -41,6 +42,7 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { translations, clients } from "@/lib/landing-data"
 import { resolveInitialLandingLocale } from "@/lib/landing-locale"
+import { products } from "@/utils/products"
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -49,6 +51,7 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedInterest, setSelectedInterest] = useState<string>("")
   const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
+  const productTriggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -332,6 +335,52 @@ export default function LandingPage() {
             </Link>
 
             <nav className="hidden lg:flex items-center space-x-8">
+              <DropdownMenu
+                onOpenChange={(isOpen) => {
+                  if (!isOpen) productTriggerRef.current?.blur()
+                }}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    ref={productTriggerRef}
+                    variant="ghost"
+                    size="sm"
+                    className="text-slate-300 hover:text-blue-400 gap-1.5 px-2 font-medium outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  >
+                    <span>{t.nav.products}</span>
+                    <ChevronDown className="h-3 w-3 opacity-70" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-slate-900 border-slate-700 min-w-[220px] p-1.5 space-y-1.5">
+                  {products.map((product) =>
+                    product.available ? (
+                      <DropdownMenuItem key={product.website} asChild className="cursor-pointer text-slate-200">
+                        <a
+                          href={product.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex w-full items-center gap-3"
+                        >
+                          <Image src={product.logo} alt={`${product.name} logo`} width={18} height={18} />
+                          <span className="flex-1">{product.name}</span>
+                          <ArrowRight className="h-4 w-4 opacity-70" />
+                        </a>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem key={product.website} className="group relative cursor-not-allowed text-slate-500">
+                        <div className="flex w-full items-center gap-3 opacity-80">
+                          <Image src={product.logo} alt={`${product.name} logo`} width={18} height={18} />
+                          <span className="flex-1">{product.name}</span>
+                          <ArrowRight className="h-4 w-4 opacity-50" />
+                        </div>
+                        <span className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 rounded bg-slate-800 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-300 opacity-0 transition-opacity group-hover:opacity-100">
+                          Coming soon
+                        </span>
+                      </DropdownMenuItem>
+                    ),
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               {[
                 { name: t.nav.approach, href: "#approach" },
                 { name: t.nav.services, href: "#services" },
@@ -395,6 +444,38 @@ export default function LandingPage() {
           {isMenuOpen && (
             <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto">
               <nav className="container mx-auto px-4 py-6 space-y-4">
+                <div className="pt-2 border-t border-slate-800">
+                  <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">{t.nav.products}</p>
+                  <div className="space-y-2">
+                    {products.map((product) =>
+                      product.available ? (
+                        <a
+                          key={product.website}
+                          href={product.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 rounded-md px-2 py-2 text-slate-300 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                        >
+                          <Image src={product.logo} alt={`${product.name} logo`} width={16} height={16} />
+                          <span className="flex-1 text-sm">{product.name}</span>
+                          <ArrowRight className="h-4 w-4 opacity-70" />
+                        </a>
+                      ) : (
+                        <div
+                          key={product.website}
+                          className="group relative flex items-center gap-3 rounded-md px-2 py-2 text-slate-500 cursor-not-allowed"
+                        >
+                          <Image src={product.logo} alt={`${product.name} logo`} width={16} height={16} />
+                          <span className="flex-1 text-sm">{product.name}</span>
+                          <ArrowRight className="h-4 w-4 opacity-50" />
+                          <span className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 rounded bg-slate-800 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-300 opacity-0 transition-opacity group-hover:opacity-100">
+                            Coming soon
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
                 {[
                   { name: t.nav.approach, href: "#approach" },
                   { name: t.nav.services, href: "#services" },
