@@ -32,6 +32,7 @@ import {
   Server,
   Database,
   Globe,
+  ExternalLink,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -44,7 +45,52 @@ import { translations, clients } from "@/lib/landing-data"
 import { resolveInitialLandingLocale } from "@/lib/landing-locale"
 import { products } from "@/utils/products"
 
+type DiscussProjectCtaButtonProps = {
+  calendlyUrl: string
+  onOpenContact: () => void
+  className?: string
+  size?: "default" | "sm" | "lg" | "icon"
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  children: React.ReactNode
+  onBeforeAction?: () => void
+}
+
+/** When `NEXT_PUBLIC_CALENDLY_URL` is set, opens Calendly; otherwise opens the contact dialog. */
+function DiscussProjectCtaButton({
+  calendlyUrl,
+  onOpenContact,
+  className,
+  size,
+  variant,
+  children,
+  onBeforeAction,
+}: DiscussProjectCtaButtonProps) {
+  if (calendlyUrl) {
+    return (
+      <Button asChild size={size} variant={variant} className={className}>
+        <a href={calendlyUrl} target="_blank" rel="noopener noreferrer" onClick={() => onBeforeAction?.()}>
+          {children}
+        </a>
+      </Button>
+    )
+  }
+  return (
+    <Button
+      size={size}
+      variant={variant}
+      className={className}
+      onClick={() => {
+        onBeforeAction?.()
+        onOpenContact()
+      }}
+    >
+      {children}
+    </Button>
+  )
+}
+
 export default function LandingPage() {
+  const calendlyUrl = (process.env.NEXT_PUBLIC_CALENDLY_URL ?? "").trim()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isContactOpen, setIsContactOpen] = useState(false)
@@ -183,7 +229,7 @@ export default function LandingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" suppressHydrationWarning>
-      {/* Single contact dialog — all CTAs open this via setIsContactOpen(true) */}
+      {/* Contact form dialog — opened by Contact CTAs and by “Discuss project” when Calendly URL is unset */}
       <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
           <DialogHeader>
@@ -419,13 +465,14 @@ export default function LandingPage() {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button
+              <DiscussProjectCtaButton
+                calendlyUrl={calendlyUrl}
+                onOpenContact={() => setIsContactOpen(true)}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => setIsContactOpen(true)}
               >
                 {t.hero.primaryCta}
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </DiscussProjectCtaButton>
             </div>
 
             <div className="lg:hidden flex items-center space-x-2">
@@ -510,16 +557,15 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="pt-2">
-                  <Button
+                  <DiscussProjectCtaButton
+                    calendlyUrl={calendlyUrl}
+                    onOpenContact={() => setIsContactOpen(true)}
+                    onBeforeAction={() => setIsMenuOpen(false)}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                    onClick={() => {
-                      setIsMenuOpen(false)
-                      setIsContactOpen(true)
-                    }}
                   >
                     {t.hero.primaryCta}
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  </DiscussProjectCtaButton>
                 </div>
               </nav>
             </div>
@@ -549,14 +595,15 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button
+                <DiscussProjectCtaButton
+                  calendlyUrl={calendlyUrl}
+                  onOpenContact={() => setIsContactOpen(true)}
                   size="lg"
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                  onClick={() => setIsContactOpen(true)}
                 >
                   {t.hero.primaryCta}
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                </DiscussProjectCtaButton>
 
                 <Button
                   size="lg"
@@ -722,15 +769,16 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-12">
-              <Button
+              <DiscussProjectCtaButton
+                calendlyUrl={calendlyUrl}
+                onOpenContact={() => setIsContactOpen(true)}
                 size="lg"
                 variant="outline"
                 className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-                onClick={() => setIsContactOpen(true)}
               >
                 {t.hero.primaryCta}
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              </DiscussProjectCtaButton>
             </div>
           </div>
         </section>
@@ -767,15 +815,16 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-12">
-              <Button
+              <DiscussProjectCtaButton
+                calendlyUrl={calendlyUrl}
+                onOpenContact={() => setIsContactOpen(true)}
                 size="lg"
                 variant="outline"
                 className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-                onClick={() => setIsContactOpen(true)}
               >
                 {t.industries.cta}
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              </DiscussProjectCtaButton>
             </div>
           </div>
         </section>
@@ -835,14 +884,29 @@ export default function LandingPage() {
                 <p className="text-lg text-blue-100 leading-relaxed">{t.finalCta.trust}</p>
               </div>
 
-              <Button
-                size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                onClick={() => setIsContactOpen(true)}
-              >
-                {t.finalCta.button}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
+                <Button
+                  size="lg"
+                  className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
+                  onClick={() => setIsContactOpen(true)}
+                >
+                  {t.finalCta.button}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                {calendlyUrl ? (
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white/90 text-white bg-white/10 hover:bg-white/20 shadow-lg text-lg px-8 py-6 backdrop-blur-sm"
+                  >
+                    <a href={calendlyUrl} target="_blank" rel="noopener noreferrer">
+                      {t.finalCta.scheduleButton}
+                      <ExternalLink className="ml-2 h-5 w-5" />
+                    </a>
+                  </Button>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
