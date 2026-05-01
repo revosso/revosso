@@ -1,5 +1,5 @@
 /**
- * Public marketing site locales (must match translation keys in pages / landing-data).
+ * Public marketing site locales (must match translation keys in `lib/landing-translations` / `landing-data`).
  */
 export type LandingLocale = "en" | "fr" | "pt-BR" | "es"
 
