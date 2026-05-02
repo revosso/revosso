@@ -14,5 +14,5 @@ export const clients = [
   { name: "Cashlakay", url: "https://cashlakay.com", description: "Custom platform development" },
   { name: "Revofin", url: "https://finance.revosso.com", description: "Financial platform hosting" },
   { name: "Rechajem", url: "https://rechajem.revosso.com", description: "Platform development" },
-  { name: "Nuvann", url: "https://nuvann.com", description: "Platform hosting" },
+  { name: "RevoMaket", url: "https://nuvann.com", description: "MarketPlace Platform" },
 ]

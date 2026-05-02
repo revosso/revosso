@@ -19,7 +19,7 @@ export const products: Product[] = [
     available: true,
   },
   {
-    name: "Nuvann",
+    name: "RevoMaket",
     website: "https://nuvann.com",
     logo: "/images/products/nuvann.svg",
     available: false,
