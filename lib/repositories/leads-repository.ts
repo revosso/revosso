@@ -147,6 +147,28 @@ export class LeadsRepository {
       throw new Error("Failed to update lead notes")
     }
   }
+
+  /**
+   * Check whether a lead with the given email already exists within the
+   * duplicate-detection window (default: 24 hours).
+   *
+   * Used by the public ingestion endpoint to prevent trivial spam.
+   */
+  async existsByEmailSince(email: string, sinceMs: number): Promise<boolean> {
+    try {
+      const sinceDate = new Date(Date.now() - sinceMs)
+      const [row] = await db
+        .select({ id: leads.id })
+        .from(leads)
+        .where(and(eq(leads.email, email), gt(leads.createdAt, sinceDate)))
+        .limit(1)
+      return Boolean(row)
+    } catch (error) {
+      console.error("Database error checking duplicate email:", error)
+      // Fail open: don't block the request if the check itself errors
+      return false
+    }
+  }
 }
 
 // Singleton instance
