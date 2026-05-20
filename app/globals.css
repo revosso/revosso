@@ -3,8 +3,28 @@
 @tailwind utilities;
 
 html, body {
-  background-color: #020617; /* slate-950 — matches landing page background */
   overflow-x: hidden;
+}
+
+html {
+  scrollbar-gutter: stable;
+  background-color: #f8fafc; /* slate-50 */
+}
+
+html.dark,
+html.dark body {
+  background-color: #020617; /* slate-950 */
+}
+
+html.landing-overlay-open,
+html.landing-overlay-open body {
+  overflow: hidden;
+}
+
+html[data-scroll-locked],
+html[data-scroll-locked] body {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
 }
 
 @layer utilities {

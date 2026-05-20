@@ -1,17 +1,16 @@
 import type React from "react"
+import { ThemeProvider } from "@/components/theme-provider"
 
 /**
  * Landing Page Layout
- * 
- * This layout is used for the public marketing site.
- * Accessible via: revosso.com and revosso.local
- * 
+ *
+ * Public marketing site — revosso.com / revosso.local
  * No authentication required.
  */
-export default function LandingLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return <>{children}</>
+export default function LandingLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      {children}
+    </ThemeProvider>
+  )
 }
