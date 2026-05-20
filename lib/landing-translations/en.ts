@@ -7,6 +7,30 @@ export const landingEn = {
     industries: "Solutions",
     contact: "Contact",
   },
+  productsMenu: {
+    sectionLabel: "Our products",
+    comingSoon: "Coming soon",
+    items: {
+      rechajem: {
+        description: "Send money to family abroad — fast, secure, straight from your phone.",
+      },
+      revofin: {
+        description: "Track payments, invoices, and finances in one place for your business.",
+      },
+      revomaket: {
+        description: "Open your online shop and start selling to customers in minutes.",
+      },
+      revobarber: {
+        description: "Let clients book online — fewer calls, fuller chairs, less hassle.",
+      },
+      revocom: {
+        description: "Run your store, talk to customers, and sell — all in one platform.",
+      },
+      revoschool: {
+        description: "Enroll students, manage classes, and keep parents in the loop easily.",
+      },
+    },
+  },
   hero: {
     h1: "Custom Software, Platform Engineering & Scalable Infrastructure",
     subheadline:

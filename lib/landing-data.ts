@@ -12,7 +12,7 @@ export const translations = {
 
 export const clients = [
   { name: "Cashlakay", url: "https://cashlakay.com", description: "Custom platform development" },
-  { name: "Revofin", url: "https://finance.revosso.com", description: "Financial platform hosting" },
-  { name: "Rechajem", url: "https://rechajem.revosso.com", description: "Platform development" },
-  { name: "RevoMaket", url: "https://nuvann.com", description: "MarketPlace Platform" },
+  { name: "Revofin", url: "https://revofin.app/", description: "Financial platform hosting" },
+  { name: "Rechajem", url: "https://rechajem.com", description: "Platform development" },
+  { name: "RevoMaket", url: "https://revomaket.com/", description: "MarketPlace Platform" },
 ]

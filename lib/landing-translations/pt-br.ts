@@ -9,6 +9,30 @@ export const landingPtBR = {
     industries: "Soluções",
     contact: "Contato",
   },
+  productsMenu: {
+    sectionLabel: "Nossos produtos",
+    comingSoon: "Em breve",
+    items: {
+      rechajem: {
+        description: "Envie dinheiro para a família — rápido, seguro e direto do celular.",
+      },
+      revofin: {
+        description: "Pagamentos, faturas e finanças em um só lugar para o seu negócio.",
+      },
+      revomaket: {
+        description: "Abra sua loja online e comece a vender em poucos minutos.",
+      },
+      revobarber: {
+        description: "Agendamento online para barbearias e salões — menos ligações, mais clientes.",
+      },
+      revocom: {
+        description: "Sua loja, seus clientes e suas vendas — tudo em uma plataforma.",
+      },
+      revoschool: {
+        description: "Matrículas, turmas e comunicação com os pais — simples e centralizado.",
+      },
+    },
+  },
   hero: {
     h1: "Software Sob Medida, Engenharia de Plataforma e Infraestrutura Escalável",
     subheadline:

@@ -1,93 +1,14 @@
 "use client"
 
 import type React from "react"
-import Link from "next/link"
-import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Code,
-  ArrowRight,
-  ChevronDown,
-  Menu,
-  X,
-  Send,
-  CheckCircle,
-  Shield,
-  Zap,
-  Layers,
-  TrendingUp,
-  Server,
-  Database,
-  Globe,
-  ExternalLink,
-} from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { toast } from "@/hooks/use-toast"
-import { translations, clients } from "@/lib/landing-data"
-import { resolveInitialLandingLocale } from "@/lib/landing-locale"
-import { products } from "@/utils/products"
-
-type DiscussProjectCtaButtonProps = {
-  calendlyUrl: string
-  onOpenContact: () => void
-  className?: string
-  size?: "default" | "sm" | "lg" | "icon"
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
-  children: React.ReactNode
-  onBeforeAction?: () => void
-}
-
-/** When `NEXT_PUBLIC_CALENDLY_URL` is set, opens Calendly; otherwise opens the contact dialog. */
-function DiscussProjectCtaButton({
-  calendlyUrl,
-  onOpenContact,
-  className,
-  size,
-  variant,
-  children,
-  onBeforeAction,
-}: DiscussProjectCtaButtonProps) {
-  if (calendlyUrl) {
-    return (
-      <Button asChild size={size} variant={variant} className={className}>
-        <a href={calendlyUrl} target="_blank" rel="noopener noreferrer" onClick={() => onBeforeAction?.()}>
-          {children}
-        </a>
-      </Button>
-    )
-  }
-  return (
-    <Button
-      size={size}
-      variant={variant}
-      className={className}
-      onClick={() => {
-        onBeforeAction?.()
-        onOpenContact()
-      }}
-    >
-      {children}
-    </Button>
-  )
-}
+import { translations } from "@/lib/landing-data"
+import { resolveInitialLandingLocale, type LandingLocale } from "@/lib/landing-locale"
+import { LandingContactDialog } from "@/components/landing/landing-contact-dialog"
+import { LandingFooter } from "@/components/landing/landing-footer"
+import { LandingHeader } from "@/components/landing/landing-header"
+import { LandingSections } from "@/components/landing/landing-sections"
 
 export default function LandingPage() {
   const calendlyUrl = (process.env.NEXT_PUBLIC_CALENDLY_URL ?? "").trim()
@@ -96,7 +17,7 @@ export default function LandingPage() {
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedInterest, setSelectedInterest] = useState<string>("")
-  const [locale, setLocale] = useState<"en" | "fr" | "pt-BR" | "es">("en")
+  const [locale, setLocale] = useState<LandingLocale>("en")
   const productTriggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -109,16 +30,9 @@ export default function LandingPage() {
     }
   }, [])
 
-  const handleLocaleChange = (newLocale: "en" | "fr" | "pt-BR" | "es") => {
+  const handleLocaleChange = (newLocale: LandingLocale) => {
     setLocale(newLocale)
     localStorage.setItem("revosso-locale", newLocale)
-  }
-
-  const localeLabels: Record<"en" | "fr" | "pt-BR" | "es", string> = {
-    en: "EN",
-    fr: "FR",
-    "pt-BR": "PT",
-    es: "ES",
   }
 
   useEffect(() => {
@@ -127,13 +41,11 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Show a toast when redirected back from a failed admin login attempt
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const authError = params.get("auth_error")
     if (!authError) return
 
-    // Strip the param from the URL without a page reload
     const clean = window.location.pathname
     window.history.replaceState({}, document.title, clean)
 
@@ -148,6 +60,22 @@ export default function LandingPage() {
       variant: "destructive",
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const t = translations[locale]
+  const year = new Date().getFullYear()
+
+  const contactTitle =
+    selectedInterest === "NEW_PLATFORM"
+      ? t.contact.title.newPlatform
+      : selectedInterest === "PLATFORM_TAKEOVER"
+      ? t.contact.title.takeover
+      : selectedInterest === "PLATFORM_MAINTENANCE"
+      ? t.contact.title.maintenance
+      : selectedInterest === "INFRASTRUCTURE_HOSTING"
+      ? t.contact.title.hosting
+      : selectedInterest === "PARTNERSHIP"
+      ? t.contact.title.partnership
+      : t.contact.title.default
 
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -211,821 +139,38 @@ export default function LandingPage() {
     }
   }
 
-  const t = translations[locale]
-  const year = new Date().getFullYear()
-
-  const contactTitle =
-    selectedInterest === "NEW_PLATFORM"
-      ? t.contact.title.newPlatform
-      : selectedInterest === "PLATFORM_TAKEOVER"
-      ? t.contact.title.takeover
-      : selectedInterest === "PLATFORM_MAINTENANCE"
-      ? t.contact.title.maintenance
-      : selectedInterest === "INFRASTRUCTURE_HOSTING"
-      ? t.contact.title.hosting
-      : selectedInterest === "PARTNERSHIP"
-      ? t.contact.title.partnership
-      : t.contact.title.default
-
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" suppressHydrationWarning>
-      {/* Contact form dialog — opened by Contact CTAs and by “Discuss project” when Calendly URL is unset */}
-      <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white">{contactTitle}</DialogTitle>
-            <DialogDescription className="text-base text-slate-300">
-              {t.contact.description}
-            </DialogDescription>
-          </DialogHeader>
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" suppressHydrationWarning>
+      <LandingContactDialog
+        open={isContactOpen}
+        onOpenChange={setIsContactOpen}
+        title={contactTitle}
+        copy={t.contact}
+        selectedInterest={selectedInterest}
+        onSelectedInterestChange={setSelectedInterest}
+        isSubmitting={isSubmitting}
+        onSubmit={handleContactSubmit}
+      />
 
-          <form onSubmit={handleContactSubmit} className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-slate-200 font-medium">
-                  {t.contact.fields.name} *
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="John Doe"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-200 font-medium">
-                  {t.contact.fields.email} *
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="john@company.com"
-                  required
-                  className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-                />
-              </div>
-            </div>
+      <LandingHeader
+        copy={t}
+        locale={locale}
+        isScrolled={isScrolled}
+        isMenuOpen={isMenuOpen}
+        onMenuOpenChange={setIsMenuOpen}
+        onLocaleChange={handleLocaleChange}
+        calendlyUrl={calendlyUrl}
+        onOpenContact={() => setIsContactOpen(true)}
+        productTriggerRef={productTriggerRef}
+      />
 
-            <div className="space-y-2">
-              <Label htmlFor="company" className="text-slate-200 font-medium">
-                {t.contact.fields.company}
-              </Label>
-              <Input
-                id="company"
-                name="company"
-                placeholder="Your Company"
-                className="h-12 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
+      <LandingSections
+        copy={t}
+        calendlyUrl={calendlyUrl}
+        onOpenContact={() => setIsContactOpen(true)}
+      />
 
-            <div className="space-y-2">
-              <Label htmlFor="productInterest" className="text-slate-200 font-medium">
-                {t.contact.fields.need} *
-              </Label>
-              <Select name="productInterest" value={selectedInterest} onValueChange={setSelectedInterest}>
-                <SelectTrigger className="h-12 bg-slate-800 border-slate-600 text-white focus:border-blue-400 focus:ring-blue-400">
-                  <SelectValue placeholder={t.contact.fields.needPlaceholder} className="text-slate-400" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="NEW_PLATFORM" className="text-white hover:bg-slate-700">
-                    {t.contact.options.newPlatform}
-                  </SelectItem>
-                  <SelectItem value="PLATFORM_TAKEOVER" className="text-white hover:bg-slate-700">
-                    {t.contact.options.takeover}
-                  </SelectItem>
-                  <SelectItem value="PLATFORM_MAINTENANCE" className="text-white hover:bg-slate-700">
-                    {t.contact.options.maintenance}
-                  </SelectItem>
-                  <SelectItem value="INFRASTRUCTURE_HOSTING" className="text-white hover:bg-slate-700">
-                    {t.contact.options.hosting}
-                  </SelectItem>
-                  <SelectItem value="PARTNERSHIP" className="text-white hover:bg-slate-700">
-                    {t.contact.options.partnership}
-                  </SelectItem>
-                  <SelectItem value="GENERAL_INQUIRY" className="text-white hover:bg-slate-700">
-                    {t.contact.options.general}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="message" className="text-slate-200 font-medium">
-                {t.contact.fields.message} *
-              </Label>
-              <Textarea
-                id="message"
-                name="message"
-                placeholder={t.contact.fields.messagePlaceholder}
-                required
-                className="min-h-[120px] resize-none bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-
-            <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsContactOpen(false)}
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
-                disabled={isSubmitting}
-              >
-                {t.contact.buttons.cancel}
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-                disabled={isSubmitting || !selectedInterest}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    {t.contact.buttons.sending}
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    {t.contact.buttons.send}
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Header */}
-      <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          isScrolled
-            ? "bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 lg:h-20 items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity" />
-                <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg">
-                  <Code className="h-6 w-6" />
-                </div>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                REVOSSO
-              </span>
-            </Link>
-
-            <nav className="hidden lg:flex items-center space-x-8">
-              <DropdownMenu
-                onOpenChange={(isOpen) => {
-                  if (!isOpen) productTriggerRef.current?.blur()
-                }}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    ref={productTriggerRef}
-                    variant="ghost"
-                    size="sm"
-                    className="text-slate-300 hover:text-blue-400 gap-1.5 px-2 font-medium outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
-                    <span>{t.nav.products}</span>
-                    <ChevronDown className="h-3 w-3 opacity-70" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-slate-900 border-slate-700 min-w-[220px] p-1.5 space-y-1.5">
-                  {products.map((product) =>
-                    product.available ? (
-                      <DropdownMenuItem key={product.website} asChild className="cursor-pointer text-slate-200">
-                        <a
-                          href={product.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex w-full items-center gap-3"
-                        >
-                          <Image src={product.logo} alt={`${product.name} logo`} width={18} height={18} />
-                          <span className="flex-1">{product.name}</span>
-                          <ArrowRight className="h-4 w-4 opacity-70" />
-                        </a>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem key={product.website} className="group relative cursor-not-allowed text-slate-500">
-                        <div className="flex w-full items-center gap-3 opacity-80">
-                          <Image src={product.logo} alt={`${product.name} logo`} width={18} height={18} />
-                          <span className="flex-1">{product.name}</span>
-                          <ArrowRight className="h-4 w-4 opacity-50" />
-                        </div>
-                        <span className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 rounded bg-slate-800 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-300 opacity-0 transition-opacity group-hover:opacity-100">
-                          Coming soon
-                        </span>
-                      </DropdownMenuItem>
-                    ),
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {[
-                { name: t.nav.approach, href: "#approach" },
-                { name: t.nav.services, href: "#services" },
-                { name: t.nav.industries, href: "#solutions" },
-                { name: t.nav.contact, href: "#contact" },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-slate-300 hover:text-blue-400 font-medium transition-colors duration-200 relative group"
-                >
-                  {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
-            </nav>
-
-            <div className="hidden lg:flex items-center space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-slate-300 hover:text-blue-400 gap-1.5 px-2">
-                    <Globe className="h-4 w-4" />
-                    <span className="text-sm font-medium">{localeLabels[locale]}</span>
-                    <ChevronDown className="h-3 w-3 opacity-70" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700 min-w-[90px]">
-                  {(["en", "fr", "pt-BR", "es"] as const).map((l) => (
-                    <DropdownMenuItem
-                      key={l}
-                      onClick={() => handleLocaleChange(l)}
-                      className={`cursor-pointer ${locale === l ? "text-blue-400 font-medium" : "text-slate-300"}`}
-                    >
-                      {localeLabels[l]}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DiscussProjectCtaButton
-                calendlyUrl={calendlyUrl}
-                onOpenContact={() => setIsContactOpen(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                {t.hero.primaryCta}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </DiscussProjectCtaButton>
-            </div>
-
-            <div className="lg:hidden flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-slate-300"
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-          </div>
-
-          {isMenuOpen && (
-            <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-900 border-b border-slate-800 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto">
-              <nav className="container mx-auto px-4 py-6 space-y-4">
-                <div className="pt-2 border-t border-slate-800">
-                  <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">{t.nav.products}</p>
-                  <div className="space-y-2">
-                    {products.map((product) =>
-                      product.available ? (
-                        <a
-                          key={product.website}
-                          href={product.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 rounded-md px-2 py-2 text-slate-300 hover:text-blue-400 hover:bg-slate-800 transition-colors"
-                        >
-                          <Image src={product.logo} alt={`${product.name} logo`} width={16} height={16} />
-                          <span className="flex-1 text-sm">{product.name}</span>
-                          <ArrowRight className="h-4 w-4 opacity-70" />
-                        </a>
-                      ) : (
-                        <div
-                          key={product.website}
-                          className="group relative flex items-center gap-3 rounded-md px-2 py-2 text-slate-500 cursor-not-allowed"
-                        >
-                          <Image src={product.logo} alt={`${product.name} logo`} width={16} height={16} />
-                          <span className="flex-1 text-sm">{product.name}</span>
-                          <ArrowRight className="h-4 w-4 opacity-50" />
-                          <span className="pointer-events-none absolute right-8 top-1/2 -translate-y-1/2 rounded bg-slate-800 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-300 opacity-0 transition-opacity group-hover:opacity-100">
-                            Coming soon
-                          </span>
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-                {[
-                  { name: t.nav.approach, href: "#approach" },
-                  { name: t.nav.services, href: "#services" },
-                  { name: t.nav.industries, href: "#solutions" },
-                  { name: t.nav.contact, href: "#contact" },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block text-slate-300 hover:text-blue-400 font-medium py-2 transition-colors duration-200"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                <div className="pt-2 border-t border-slate-800">
-                  <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider font-medium">Language</p>
-                  <div className="flex gap-2">
-                    {(["en", "fr", "pt-BR", "es"] as const).map((l) => (
-                      <button
-                        key={l}
-                        onClick={() => handleLocaleChange(l)}
-                        className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-                          locale === l
-                            ? "bg-blue-600 text-white"
-                            : "text-slate-400 hover:text-white hover:bg-slate-800"
-                        }`}
-                      >
-                        {localeLabels[l]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <DiscussProjectCtaButton
-                    calendlyUrl={calendlyUrl}
-                    onOpenContact={() => setIsContactOpen(true)}
-                    onBeforeAction={() => setIsMenuOpen(false)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  >
-                    {t.hero.primaryCta}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </DiscussProjectCtaButton>
-                </div>
-              </nav>
-            </div>
-          )}
-        </div>
-      </header>
-
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative overflow-x-hidden py-20 lg:py-32">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-          <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl" />
-          </div>
-
-          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-            <div className="text-center space-y-8 py-16 lg:py-24">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-                  {t.hero.h1}
-                </span>
-              </h1>
-
-              <p className="text-xl sm:text-2xl lg:text-3xl text-slate-300 leading-relaxed max-w-3xl mx-auto">
-                {t.hero.subheadline}
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <DiscussProjectCtaButton
-                  calendlyUrl={calendlyUrl}
-                  onOpenContact={() => setIsContactOpen(true)}
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                >
-                  {t.hero.primaryCta}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </DiscussProjectCtaButton>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-                  onClick={() => document.getElementById("approach")?.scrollIntoView({ behavior: "smooth" })}
-                >
-                  {t.hero.secondaryCta}
-                  <ChevronDown className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Who We Are Section */}
-        <section id="approach" className="py-20 lg:py-32 bg-slate-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="space-y-12">
-              <div className="text-center space-y-4">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-                  {t.whoWeAre.title}
-                </h2>
-              </div>
-
-              <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
-                <p>{t.whoWeAre.intro}</p>
-
-                <p className="font-medium text-white">{t.whoWeAre.partnerTitle}</p>
-
-                <ul className="space-y-3 list-none">
-                  {t.whoWeAre.requirements.map((req, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-blue-400 mr-3 mt-1 flex-shrink-0" />
-                      <span>{req}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="pt-4 font-medium text-white whitespace-pre-line">{t.whoWeAre.closing}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Platform Lifecycle Engineering Section */}
-        <section id="services" className="py-20 lg:py-32 bg-slate-950">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {t.platformLifecycle.title}
-              </h2>
-              <p className="text-xl text-slate-300 max-w-3xl mx-auto">{t.platformLifecycle.subtitle}</p>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
-                <CardContent className="p-8 lg:p-10 space-y-6">
-                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-                    <Layers className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {t.platformLifecycle.build.title}
-                    </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg">
-                      {t.platformLifecycle.build.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
-                <CardContent className="p-8 lg:p-10 space-y-6">
-                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
-                    <TrendingUp className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {t.platformLifecycle.takeOver.title}
-                    </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg mb-4">
-                      {t.platformLifecycle.takeOver.intro}
-                    </p>
-                    <ul className="space-y-2 text-slate-300">
-                      {t.platformLifecycle.takeOver.items.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
-                <CardContent className="p-8 lg:p-10 space-y-6">
-                  <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
-                    <Server className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white">
-                      {t.platformLifecycle.operate.title}
-                    </h3>
-                    <p className="text-slate-300 leading-relaxed text-lg mb-4">
-                      {t.platformLifecycle.operate.intro}
-                    </p>
-                    <ul className="space-y-2 text-slate-300">
-                      {t.platformLifecycle.operate.items.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <CheckCircle className="h-4 w-4 text-blue-400 mr-3 mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="text-center mt-12">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                onClick={() => setIsContactOpen(true)}
-              >
-                {t.platformLifecycle.cta}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* How We Work Section */}
-        <section className="py-20 lg:py-32 bg-slate-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {t.howWeWork.title}
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[
-                { icon: Layers, ...t.howWeWork.principles[0] },
-                { icon: TrendingUp, ...t.howWeWork.principles[1] },
-                { icon: Shield, ...t.howWeWork.principles[2] },
-                { icon: Code, ...t.howWeWork.principles[3] },
-                { icon: Zap, ...t.howWeWork.principles[4] },
-                { icon: Database, ...t.howWeWork.principles[5] },
-              ].map((principle, index) => (
-                <Card key={index} className="border-0 bg-slate-800/50 shadow-lg">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600">
-                      <principle.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white">{principle.title}</h3>
-                    <p className="text-slate-300">{principle.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <DiscussProjectCtaButton
-                calendlyUrl={calendlyUrl}
-                onOpenContact={() => setIsContactOpen(true)}
-                size="lg"
-                variant="outline"
-                className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-              >
-                {t.hero.primaryCta}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </DiscussProjectCtaButton>
-            </div>
-          </div>
-        </section>
-
-        {/* Capabilities Section */}
-        <section id="solutions" className="py-20 lg:py-32 bg-slate-950">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {t.industries.title}
-              </h2>
-              <p className="text-lg text-slate-400 max-w-2xl mx-auto mt-4 leading-relaxed">
-                {t.industries.subtitle}
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                { icon: Code, ...t.industries.items[0] },
-                { icon: TrendingUp, ...t.industries.items[1] },
-                { icon: Layers, ...t.industries.items[2] },
-                { icon: Server, ...t.industries.items[3] },
-              ].map((capability, index) => (
-                <Card key={index} className="border-0 bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl">
-                  <CardContent className="p-8 space-y-4">
-                    <div className="inline-flex p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-                      <capability.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white">{capability.title}</h3>
-                    <p className="text-slate-300 leading-relaxed">{capability.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <DiscussProjectCtaButton
-                calendlyUrl={calendlyUrl}
-                onOpenContact={() => setIsContactOpen(true)}
-                size="lg"
-                variant="outline"
-                className="border-2 border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 text-lg px-8 py-6 bg-transparent backdrop-blur-sm"
-              >
-                {t.industries.cta}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </DiscussProjectCtaButton>
-            </div>
-          </div>
-        </section>
-
-        {/* Clients & Partners Section */}
-        <section className="py-20 lg:py-32 bg-slate-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {t.clients.title}
-              </h2>
-              <p className="text-xl text-slate-300 max-w-3xl mx-auto">{t.clients.copy}</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
-              {clients.map((client, index) => (
-                <a
-                  key={index}
-                  href={client.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-400/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
-                >
-                  <div className="text-2xl lg:text-3xl font-bold text-slate-300 group-hover:text-white transition-colors duration-300 text-center">
-                    {client.name}
-                  </div>
-                  <p className="text-sm text-slate-500 group-hover:text-slate-400 mt-3 text-center transition-colors duration-300">
-                    {client.description}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section
-          id="contact"
-          className="py-20 lg:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden"
-        >
-          <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          </div>
-
-          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
-            <div className="space-y-8">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white">
-                {t.finalCta.title}
-              </h2>
-
-              <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-2xl mx-auto">
-                {t.finalCta.subtitle}
-              </p>
-
-              <div className="max-w-2xl mx-auto space-y-4 pt-4">
-                <p className="text-lg text-blue-100 leading-relaxed">{t.finalCta.trust}</p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-6"
-                  onClick={() => setIsContactOpen(true)}
-                >
-                  {t.finalCta.button}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                {calendlyUrl ? (
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-white/90 text-white bg-white/10 hover:bg-white/20 shadow-lg text-lg px-8 py-6 backdrop-blur-sm"
-                  >
-                    <a href={calendlyUrl} target="_blank" rel="noopener noreferrer">
-                      {t.finalCta.scheduleButton}
-                      <ExternalLink className="ml-2 h-5 w-5" />
-                    </a>
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-slate-950 text-white py-16 border-t border-slate-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="space-y-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-lg">
-                  <Code className="h-6 w-6" />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  REVOSSO
-                </span>
-              </Link>
-              <p className="text-slate-400 leading-relaxed">{t.footer.description}</p>
-              <p className="text-slate-400 text-sm">
-                <a href="mailto:contact@revosso.com" className="hover:text-white transition-colors">
-                  contact@revosso.com
-                </a>
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t.footer.services}</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="#services" className="hover:text-white transition-colors">
-                    {t.footer.links.customPlatforms}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#services" className="hover:text-white transition-colors">
-                    {t.footer.links.platformEngineering}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#services" className="hover:text-white transition-colors">
-                    {t.footer.links.infrastructure}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t.footer.company}</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="#approach" className="hover:text-white transition-colors">
-                    {t.footer.links.ourApproach}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#solutions" className="hover:text-white transition-colors">
-                    {t.footer.links.industries}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#contact" className="hover:text-white transition-colors">
-                    {t.footer.links.contact}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t.footer.legal}</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="/privacy" className="hover:text-white transition-colors">
-                    {t.footer.links.privacy}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white transition-colors">
-                    {t.footer.links.terms}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cookies" className="hover:text-white transition-colors">
-                    {t.footer.links.cookies}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/security" className="hover:text-white transition-colors">
-                    {t.footer.links.security}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-400 text-sm text-center md:text-left">
-              © {year} Revosso. {t.footer.copyright}
-            </p>
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-slate-400 text-sm">
-              <Link href="/privacy" className="hover:text-white transition-colors">
-                {t.footer.links.privacy}
-              </Link>
-              <span>·</span>
-              <Link href="/terms" className="hover:text-white transition-colors">
-                {t.footer.links.terms}
-              </Link>
-              <span>·</span>
-              <Link href="/security" className="hover:text-white transition-colors">
-                {t.footer.links.security}
-              </Link>
-              <span>·</span>
-              <Link href="/cookies" className="hover:text-white transition-colors">
-                {t.footer.links.cookies}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter copy={t} year={year} />
     </div>
   )
 }
